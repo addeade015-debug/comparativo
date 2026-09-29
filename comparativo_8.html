@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17365d">
+  <meta name="description" content="Cuadros comparativos, seguimiento de órdenes y dashboard de adquisiciones.">
+  <title>Control de Adquisiciones</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2317365d'/%3E%3Cpath d='M15 18h34v8H15zm0 13h21v8H15zm0 13h28v8H15z' fill='white'/%3E%3Ccircle cx='47' cy='35' r='8' fill='%23f4b41a'/%3E%3Cpath d='m43 35 3 3 6-7' fill='none' stroke='%2317365d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --navy:#17365d; --navy-2:#244b78; --blue:#5b9bd5; --sky:#eaf2f8;
+      --ink:#172033; --muted:#5e6b7b; --line:#d6e0eb; --paper:#f5f8fb;
+      --white:#fff; --yellow:#fff2cc; --amber:#f4b41a; --green:#2e7d5b;
+      --green-bg:#e7f5ee; --red:#a63030; --red-bg:#fdeaea; --radius:14px;
+      --shadow:0 12px 28px rgba(23,54,93,.09);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 Arial,Helvetica,sans-serif}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer;touch-action:manipulation}
+    .app-shell{min-height:100vh}
+    .topbar{position:sticky;top:0;z-index:20;background:linear-gradient(100deg,var(--navy),#214e7d);color:#fff;box-shadow:0 4px 18px rgba(8,29,56,.2)}
+    .topbar-inner{max-width:1600px;margin:auto;display:flex;align-items:center;gap:24px;padding:14px 22px}
+    .brand{display:flex;align-items:center;gap:12px;min-width:max-content}
+    .brand-mark{width:42px;height:42px;border:1px solid rgba(255,255,255,.24);border-radius:12px;background:rgba(255,255,255,.1);display:grid;place-items:center;font-weight:800}
+    .brand strong{display:block;font-size:1.05rem}.brand span{font-size:.78rem;color:#cfe1f3}
+    .nav-tabs{display:flex;gap:6px;overflow-x:auto;margin-left:auto;scrollbar-width:none}
+    .nav-tabs::-webkit-scrollbar{display:none}
+    .nav-btn{border:0;background:transparent;color:#dce9f7;padding:10px 14px;border-radius:9px;white-space:nowrap;font-weight:700}
+    .nav-btn:hover,.nav-btn:focus-visible{background:rgba(255,255,255,.1);outline:none}
+    .nav-btn.active{background:#fff;color:var(--navy)}
+    main{max-width:1600px;margin:0 auto;padding:24px 22px 60px}
+    .view{display:none}.view.active{display:block}
+    .view-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:18px}
+    .view-head h1{margin:0;color:var(--navy);font-size:1.6rem;line-height:1.15}
+    .view-head p{margin:6px 0 0;color:var(--muted);max-width:760px}
+    .local-note{font-size:.82rem;color:var(--muted);background:#fff;border:1px solid var(--line);padding:8px 11px;border-radius:9px;white-space:nowrap}
+    .edit-ready{display:inline-flex;align-items:center;gap:8px;border:1px solid #9bd0b8;background:var(--green-bg);color:var(--green);font-weight:800;border-radius:999px;padding:8px 12px;white-space:nowrap}
+    .edit-ready::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--green)}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden}
+    .panel-head{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 18px;background:linear-gradient(90deg,var(--sky),#fff);border-bottom:1px solid var(--line)}
+    .panel-head h2{margin:0;color:var(--navy);font-size:1.05rem}
+    .panel-body{padding:18px}
+    .grid{display:grid;gap:14px}.grid.cols-6{grid-template-columns:repeat(6,minmax(120px,1fr))}.grid.cols-4{grid-template-columns:repeat(4,minmax(150px,1fr))}
+    label{display:grid;gap:6px;font-weight:700;color:#344054;font-size:.88rem}
+    input,select,textarea{width:100%;border:1px solid #bfcbd8;border-radius:9px;background:#fff;padding:10px 11px;color:var(--ink);min-height:42px;pointer-events:auto!important;position:relative;z-index:2;touch-action:manipulation;caret-color:var(--navy);opacity:1!important}
+    input,textarea{-webkit-user-select:text!important;user-select:text!important}
+    select{-webkit-user-select:auto!important;user-select:auto!important}
+    input:focus,select:focus,textarea:focus{outline:3px solid rgba(91,155,213,.22);border-color:var(--blue)}
+    .input-prefix{display:flex;align-items:stretch;border:1px solid #bfcbd8;border-radius:9px;background:#fff;overflow:hidden;min-height:42px}
+    .input-prefix:focus-within{outline:3px solid rgba(91,155,213,.22);border-color:var(--blue)}
+    .input-prefix span{display:flex;align-items:center;padding:0 0 0 11px;color:var(--navy);font-weight:800;background:#fff2cc}
+    .input-prefix input{border:0;border-radius:0;min-height:40px;padding-left:3px;background:#fff2cc}
+    .input-prefix input:focus{outline:0;border:0}
+    .input-required{background:var(--yellow)}
+    textarea{min-height:82px;resize:vertical}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:11px}
+    table{width:100%;border-collapse:collapse;min-width:780px}
+    th{background:var(--navy);color:#fff;text-align:center;font-size:.82rem;padding:10px 9px;position:sticky;top:0;z-index:1}
+    td{border-bottom:1px solid var(--line);padding:8px 9px;font-size:.86rem;vertical-align:middle}
+    tbody tr:nth-child(even){background:#f9fbfd}tbody tr:hover{background:#f1f7fc}
+    td input,td select{min-height:36px;padding:7px 8px;border-radius:7px}
+    .num{text-align:right;font-variant-numeric:tabular-nums}.center{text-align:center}
+    .toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+    .btn{border:1px solid transparent;border-radius:9px;padding:9px 13px;font-weight:800;min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+    .btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:#102b4c}
+    .btn-secondary{background:#fff;border-color:#9ab2ca;color:var(--navy)}.btn-secondary:hover{background:var(--sky)}
+    .btn-warning{background:var(--amber);color:#2f2a1c}.btn-danger{background:#fff;border-color:#e1a9a9;color:var(--red)}
+    .btn-sm{min-height:34px;padding:6px 9px;font-size:.82rem}
+    .hidden{display:none!important}
+    .import-panel{border-color:#a8bfd6}
+    .import-layout{display:grid;grid-template-columns:minmax(260px,.72fr) minmax(420px,1.28fr);gap:16px;align-items:start}
+    .file-drop{border:2px dashed #9ab2ca;border-radius:12px;background:#f7faff;padding:18px;display:grid;gap:10px;justify-items:start}
+    .file-drop strong{color:var(--navy)}.file-drop p{margin:0;color:var(--muted);font-size:.86rem}
+    .file-name{font-size:.82rem;color:var(--navy);font-weight:700;overflow-wrap:anywhere}
+    .import-preview{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff}
+    .import-preview h3{margin:0 0 11px;color:var(--navy);font-size:1rem}
+    .preview-facts{display:grid;grid-template-columns:repeat(3,minmax(130px,1fr));gap:8px;margin-bottom:12px}
+    .preview-fact{border:1px solid var(--line);border-radius:8px;padding:8px;background:#f9fbfd;min-width:0}
+    .preview-fact span{display:block;color:var(--muted);font-size:.72rem;font-weight:700}.preview-fact strong{display:block;margin-top:2px;color:var(--navy);font-size:.86rem;overflow-wrap:anywhere}
+    .preview-items{max-height:250px;overflow:auto;border:1px solid var(--line);border-radius:9px}.preview-items table{min-width:620px}.preview-items th{position:sticky}.preview-items td{font-size:.8rem}
+    .import-status{min-height:20px;color:var(--muted);font-size:.83rem}.import-status.error{color:var(--red);font-weight:700}
+    .supplier-strip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(300px,1fr);gap:14px;overflow-x:auto;padding-bottom:6px}
+    .supplier-card{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;min-width:0}
+    .supplier-card.winner{border:2px solid var(--green);box-shadow:0 0 0 3px rgba(46,125,91,.08)}
+    .supplier-title{padding:12px 14px;background:var(--navy);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .supplier-title strong{font-size:.94rem}.supplier-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;background:#f7faff}
+    .supplier-prices{padding:0 12px 12px}.supplier-prices table{min-width:0}.supplier-prices th{position:static;background:var(--navy-2)}
+    .supplier-total{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--sky);color:var(--navy);font-weight:800}
+    .decision-grid{display:grid;grid-template-columns:minmax(220px,1fr) minmax(280px,2fr) 240px;gap:14px;align-items:end}
+    .recommendation{border-left:5px solid var(--green);background:var(--green-bg);padding:13px 15px;border-radius:9px;color:#245f47}
+    .recommendation.warning{border-color:var(--amber);background:#fff7dc;color:#665218}
+    .history-list{display:grid;gap:8px}.history-item{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px}.history-item small{color:var(--muted)}
+    .status{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 9px;font-size:.78rem;font-weight:800;white-space:nowrap}
+    .status::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+    .status-red{background:var(--red-bg);color:var(--red)}.status-amber{background:#fff4d2;color:#825f00}.status-green{background:var(--green-bg);color:var(--green)}.status-blue{background:var(--sky);color:var(--navy)}.status-gray{background:#edf0f3;color:#596273}
+    .kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+    .kpi{background:#fff;border:1px solid var(--line);border-top:5px solid var(--navy);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+    .kpi span{display:block;color:var(--muted);font-size:.8rem;font-weight:700}.kpi strong{display:block;color:var(--navy);font-size:1.45rem;margin-top:7px;font-variant-numeric:tabular-nums}
+    .dashboard-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.chart-list{display:grid;gap:12px}
+    .bar-row{display:grid;grid-template-columns:75px minmax(120px,1fr) 120px;gap:10px;align-items:center;font-size:.86rem}
+    .bar-track{height:18px;background:#e8eef5;border-radius:999px;overflow:hidden}.bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--navy));border-radius:999px;min-width:2px}
+    .quality-list{display:grid;gap:9px}.quality-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:11px 12px;border:1px solid var(--line);border-radius:9px}.quality-row strong{color:var(--navy)}
+    .filters{display:flex;flex-wrap:wrap;gap:10px}.filters label{min-width:180px}
+    .empty{padding:28px;text-align:center;color:var(--muted)}
+    .toast{position:fixed;right:20px;bottom:20px;z-index:80;max-width:360px;background:var(--ink);color:#fff;border-radius:11px;padding:12px 15px;box-shadow:0 12px 36px rgba(0,0,0,.25);transform:translateY(20px);opacity:0;pointer-events:none;transition:.2s}
+    .toast.show{transform:translateY(0);opacity:1}.toast.error{background:var(--red)}
+    .modal-backdrop{position:fixed;inset:0;z-index:60;background:rgba(10,25,44,.55);display:none;align-items:center;justify-content:center;padding:18px}.modal-backdrop.open{display:flex}
+    .modal{width:min(980px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.3)}
+    .modal-head{position:sticky;top:0;background:#fff;display:flex;justify-content:space-between;align-items:center;padding:15px 18px;border-bottom:1px solid var(--line);z-index:2}.modal-head h2{margin:0;color:var(--navy);font-size:1.15rem}.modal-body{padding:18px}.modal-actions{display:flex;justify-content:flex-end;gap:9px;padding:14px 18px;border-top:1px solid var(--line)}
+    .close-btn{background:transparent;border:0;font-size:1.5rem;color:var(--muted)}
+    #printArea{display:none}
+    .muted{color:var(--muted)}.small{font-size:.8rem}.nowrap{white-space:nowrap}
+    @media (max-width:1100px){.grid.cols-6{grid-template-columns:repeat(3,1fr)}.grid.cols-4{grid-template-columns:repeat(2,1fr)}.kpi-grid{grid-template-columns:repeat(3,1fr)}.dashboard-grid,.import-layout{grid-template-columns:1fr}.decision-grid{grid-template-columns:1fr 1fr}.decision-grid .recommendation{grid-column:1/-1}}
+    @media (max-width:720px){.topbar-inner{align-items:flex-start;flex-direction:column;gap:10px;padding:12px 14px}.nav-tabs{width:100%;margin:0}.nav-btn{flex:1}.brand span{display:none}main{padding:18px 12px 50px}.view-head{display:block}.local-note{display:inline-block;margin-top:10px;white-space:normal}.grid.cols-6,.grid.cols-4{grid-template-columns:1fr}.kpi-grid,.preview-facts{grid-template-columns:repeat(2,1fr)}.supplier-strip{grid-auto-columns:88vw}.decision-grid{grid-template-columns:1fr}.panel-body{padding:13px}.panel-head{align-items:flex-start;flex-direction:column}.bar-row{grid-template-columns:62px 1fr 90px}.toolbar .btn{flex:1}.history-item{align-items:flex-start;flex-direction:column}}
+    @media print{
+      @page{size:A4 landscape;margin:10mm}
+      body{background:#fff;font-size:10pt}.topbar,main,.toast,.modal-backdrop{display:none!important}#printArea{display:block!important;color:#111}.print-title{font-size:18pt;color:#17365d;border-bottom:2px solid #5b9bd5;padding-bottom:6px}.print-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}.print-box{border:1px solid #aebccc;padding:6px}.print-table{width:100%;min-width:0;border-collapse:collapse;margin:10px 0;page-break-inside:auto}.print-table th{position:static;background:#17365d!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.print-table td,.print-table th{border:1px solid #aebccc;padding:5px;font-size:8.5pt}.print-note{border-left:4px solid #f4b41a;padding:8px;background:#fff7dc!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.page-break{page-break-before:always}
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand"><div class="brand-mark">ADQ</div><div><strong>Control de Adquisiciones</strong><span>Comparativos, órdenes y generación de valor</span></div></div>
+        <nav class="nav-tabs" aria-label="Módulos principales">
+          <button class="nav-btn active" data-view="comparativo">Cuadro comparativo</button>
+          <button class="nav-btn" data-view="seguimiento">Seguimiento OC</button>
+          <button class="nav-btn" data-view="dashboard">Dashboard</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="comparativo" class="view active" aria-labelledby="comparativoTitle">
+        <div class="view-head"><div><h1 id="comparativoTitle">Cuadro comparativo de ofertas</h1><p>Registre hasta cinco proveedores, adjudique una alternativa y deje trazabilidad de la decisión. Toque las celdas amarillas o blancas para escribir y las flechas para seleccionar.</p></div><button type="button" class="edit-ready" id="editModeBtn">Cargando edición…</button></div>
+        <noscript><div class="panel"><div class="panel-body">Para rellenar y agregar datos, abra esta página en Chrome o Samsung Internet con JavaScript habilitado.</div></div></noscript>
+        <div class="panel import-panel">
+          <div class="panel-head"><h2>Importar solicitud desde Excel</h2><span class="muted small">Formato de solicitud · hoja SOLICITUD</span></div>
+          <div class="panel-body import-layout">
+            <div class="file-drop">
+              <strong>Seleccione el archivo de solicitud</strong>
+              <p>Se leerán código, fecha, área solicitante, solicitante, proveedor sugerido, ítems y especificaciones. El archivo original no se modifica.</p>
+              <input id="requestFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="hidden">
+              <button type="button" class="btn btn-primary" id="chooseRequestFile">Seleccionar Excel</button>
+              <div class="file-name" id="requestFileName">Ningún archivo seleccionado</div>
+              <div class="import-status" id="importStatus" role="status" aria-live="polite"></div>
+            </div>
+            <div class="import-preview hidden" id="importPreview">
+              <h3>Vista previa antes de importar</h3>
+              <div class="preview-facts" id="importFacts"></div>
+              <div class="preview-items"><table><thead><tr><th>N°</th><th>Código</th><th>Descripción</th><th>Cantidad</th><th>Unidad</th></tr></thead><tbody id="importItems"></tbody></table></div>
+              <div id="importSpecifications" class="muted small" style="margin-top:10px"></div>
+              <div class="toolbar" style="margin-top:13px"><button type="button" class="btn btn-primary" id="applyImport">Importar datos al comparativo</button><button type="button" class="btn btn-secondary" id="cancelImport">Cancelar</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Antecedentes de la solicitud</h2><div class="toolbar"><button class="btn btn-secondary btn-sm" id="newComparison">Nuevo</button><button class="btn btn-primary btn-sm" id="saveComparison">Guardar comparativo</button></div></div>
+          <div class="panel-body grid cols-6">
+            <label>Código solicitud<input id="cmpCode" class="input-required" placeholder="PL-000-26"></label>
+            <label>SA<div class="input-prefix"><span aria-hidden="true">SA-</span><input id="cmpSA" inputmode="numeric" pattern="[0-9]*" placeholder="0000" aria-label="Número de SA"></div></label>
+            <label>Fecha<input id="cmpDate" type="date"></label>
+            <label>Moneda<select id="cmpCurrency"><option>CLP</option><option>USD</option><option>EUR</option><option>UF</option></select></label>
+            <label>Unidad / área<input id="cmpUnit" placeholder="Área solicitante"></label>
+            <label>Solicitante<input id="cmpRequester" placeholder="Nombre"></label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Ítems requeridos</h2><button class="btn btn-secondary btn-sm" id="addItem">Agregar ítem</button></div>
+          <div class="panel-body"><div class="table-wrap"><table><thead><tr><th style="width:55px">N°</th><th style="width:150px">Código</th><th>Descripción</th><th style="width:120px">Cantidad</th><th style="width:140px">Unidad</th><th style="width:75px">Acción</th></tr></thead><tbody id="itemsBody"></tbody></table></div><label style="margin-top:14px">Especificaciones adicionales<textarea id="cmpSpecifications" placeholder="Embalaje, presentación, requerimientos técnicos u otras observaciones de la solicitud"></textarea></label></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Ofertas de proveedores</h2><div class="toolbar"><span class="muted small">Máximo 5 proveedores</span><button class="btn btn-secondary btn-sm" id="addSupplier">Agregar proveedor</button></div></div>
+          <div class="panel-body"><div id="supplierStrip" class="supplier-strip"></div></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Adjudicación y respaldo</h2></div>
+          <div class="panel-body">
+            <div class="decision-grid">
+              <label>Proveedor adjudicado<select id="selectedSupplier" class="input-required"><option value="">Seleccione</option></select></label>
+              <label>Motivo de adjudicación<textarea id="decisionReason" placeholder="Obligatorio cuando no se selecciona la alternativa de menor precio"></textarea></label>
+              <div id="recommendation" class="recommendation">Complete las ofertas para obtener una recomendación.</div>
+            </div>
+            <div class="toolbar" style="margin-top:16px"><button class="btn btn-primary" id="saveAndTrack">Guardar y enviar a seguimiento</button><button class="btn btn-secondary" id="exportComparisonExcel">Descargar Excel</button><button class="btn btn-secondary" id="exportComparisonPdf">Descargar PDF</button></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Comparativos guardados</h2></div>
+          <div class="panel-body"><div id="comparisonHistory" class="history-list"></div></div>
+        </div>
+      </section>
+
+      <section id="seguimiento" class="view" aria-labelledby="trackingTitle">
+        <div class="view-head"><div><h1 id="trackingTitle">Seguimiento de órdenes de compra</h1><p>Controle emisión, compromiso de entrega, recepción, responsables y próximas acciones.</p></div><div class="toolbar"><button class="btn btn-primary" id="openOrderModal">Registrar orden</button><button class="btn btn-secondary" id="exportOrdersExcel">Descargar Excel</button></div></div>
+        <div class="panel">
+          <div class="panel-head"><h2>Registro de órdenes</h2><div class="filters"><label>Buscar<input id="orderSearch" placeholder="Código, SA, proveedor u OC"></label><label>Estado<select id="orderStatusFilter"><option value="">Todos</option><option>Por emitir</option><option>OC emitida</option><option>Confirmada</option><option>En tránsito</option><option>Recepción parcial</option><option>Cumplida</option><option>Cerrada</option><option>Forzada</option><option>Anulada</option></select></label></div></div>
+          <div class="panel-body"><div class="table-wrap"><table><thead><tr><th>Código</th><th>Prefijo</th><th>SA</th><th>Proveedor</th><th>Monto</th><th>Ahorro</th><th>N° OC</th><th>Estado</th><th>Compromiso</th><th>Semáforo</th><th>Responsable</th><th>Acciones</th></tr></thead><tbody id="ordersBody"></tbody></table></div></div>
+        </div>
+      </section>
+
+      <section id="dashboard" class="view" aria-labelledby="dashboardTitle">
+        <div class="view-head"><div><h1 id="dashboardTitle">Dashboard de adquisiciones</h1><p>Indicadores de volumen, ahorro, avance operacional y calidad del registro.</p></div><div class="filters"><label>Prefijo<select id="dashPrefix"><option value="">Todos</option></select></label><label>Estado<select id="dashStatus"><option value="">Todos</option></select></label></div></div>
+        <div id="kpiGrid" class="kpi-grid"></div>
+        <div class="dashboard-grid">
+          <div class="panel"><div class="panel-head"><h2>Monto adjudicado por prefijo</h2></div><div class="panel-body"><div id="prefixChart" class="chart-list"></div></div></div>
+          <div class="panel"><div class="panel-head"><h2>Órdenes por estado</h2></div><div class="panel-body"><div id="statusChart" class="chart-list"></div></div></div>
+          <div class="panel"><div class="panel-head"><h2>Resumen por prefijo</h2></div><div class="panel-body"><div class="table-wrap"><table><thead><tr><th>Prefijo</th><th>Solicitudes</th><th>Monto adjudicado</th><th>Ahorro informado</th><th>Ahorro validado</th><th>Atrasadas</th></tr></thead><tbody id="prefixTable"></tbody></table></div></div></div>
+          <div class="panel"><div class="panel-head"><h2>Calidad del registro</h2></div><div class="panel-body"><div id="qualityList" class="quality-list"></div></div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="orderModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle">
+    <div class="modal">
+      <div class="modal-head"><h2 id="orderModalTitle">Registrar orden</h2><button class="close-btn" id="closeOrderModal" aria-label="Cerrar">×</button></div>
+      <div class="modal-body grid cols-4">
+        <input type="hidden" id="orderId">
+        <label>Fecha registro<input id="orderDate" type="date"></label><label>Código solicitud<input id="orderCode" class="input-required"></label><label>SA<input id="orderSA"></label><label>Proveedor<input id="orderProvider" class="input-required"></label>
+        <label>Monto adjudicado<input id="orderAmount" type="number" min="0"></label><label>Monto referencia<input id="orderReference" type="number" min="0"></label><label>Origen referencia<select id="orderReferenceSource"><option>Mayor cotización</option><option>Segunda mejor oferta</option><option>Presupuesto aprobado</option><option>Precio histórico</option><option>Negociación</option><option>Otro</option></select></label><label>Validación ahorro<select id="orderSavingValidation"><option>Por validar</option><option>Validado</option><option>Rechazado</option></select></label>
+        <label>N° OC<input id="orderOC"></label><label>Estado<select id="orderStatus"><option value="">Sin estado</option><option>Por emitir</option><option>OC emitida</option><option>Confirmada</option><option>En tránsito</option><option>Recepción parcial</option><option>Cumplida</option><option>Cerrada</option><option>Forzada</option><option>Anulada</option></select></label><label>Fecha emisión<input id="orderIssueDate" type="date"></label><label>Fecha compromiso<input id="orderCommitment" type="date"></label>
+        <label>Fecha recepción<input id="orderReception" type="date"></label><label>Responsable<input id="orderOwner"></label><label>Próxima acción<input id="orderNextAction"></label><label>Fecha próxima acción<input id="orderNextDate" type="date"></label>
+        <label>Unidad / área<input id="orderUnit"></label><label>Tipo de compra<select id="orderType"><option value=""></option><option>Compra directa</option><option>Licitación</option><option>Convenio marco</option><option>Regularización</option><option>Emergencia</option><option>Contrato</option><option>Otro</option></select></label><label>Moneda<select id="orderCurrency"><option>CLP</option><option>USD</option><option>EUR</option><option>UF</option></select></label><label>Motivo adjudicación<input id="orderReason"></label>
+        <label style="grid-column:1/-1">Observaciones<textarea id="orderNotes"></textarea></label>
+      </div>
+      <div class="modal-actions"><button class="btn btn-secondary" id="cancelOrder">Cancelar</button><button class="btn btn-primary" id="saveOrder">Guardar orden</button></div>
+    </div>
+  </div>
+  <div id="printArea"></div><div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+  (() => {
+    'use strict';
+    const STORAGE_KEY = 'control-adquisiciones-v1';
+    const statuses = ['Por emitir','OC emitida','Confirmada','En tránsito','Recepción parcial','Cumplida','Cerrada','Forzada','Anulada'];
+    const initialOrders = [
+      [null,'ER-064-26',null,'SUMINEX',2849700,5500207,'Mayor cotización (histórico)',2650507,'Por validar'],[null,'PL-397-26','SA-6811','LEUCA',1760400,2815795.1,'Mayor cotización (histórico)',1055395.1,'Por validar'],[null,'PL-400-26','SA-6816','PRODALAM',269500,383407,'Mayor cotización (histórico)',113907,'Por validar'],[null,'PL-377-26','SA-6774','SIELCOM',1613445.36,2590518,'Mayor cotización (histórico)',977072.64,'Por validar'],[null,'MA-017-26','SA-6764','COMENTA',2139880,2212605,'Mayor cotización (histórico)',72725,'Por validar'],[null,'PL-395-26','SA-6810','LEUCA',3254720,3850340,'Mayor cotización (histórico)',595620,'Por validar'],[null,'MP-021-26','SA-6857','SUMINEX',485105,1260394.64,'Mayor cotización (histórico)',775289.64,'Por validar'],[null,'PL-427-26','SA-6874','SUMINEX',209505,315662,'Mayor cotización (histórico)',106157,'Por validar'],[null,'PL-536-26','SA-6865','PERNOSTICK',851492,2761996,'Mayor cotización (histórico)',1910504,'Por validar'],[null,'PL-413-26','SA-6854','RODAMENDEZ',116000,168016,'Mayor cotización (histórico)',52016,'Por validar'],[null,'PL-424-424-26','SA-6864','SUMINEX',1686600,2201262,'Mayor cotización (histórico)',514662,'Por validar'],[null,'MP-020-022-26','SA-6863','SUMINEX',297480,2621512.56,'Mayor cotización (histórico)',2324032.56,'Por validar'],[null,'PL-394-26','SA-6819','SM PRO',6308000,8933914,'Mayor cotización (histórico)',2625914,'Por validar'],[null,'PL-403-26','SA-6818','INDISOL',3720000,21116940,'Mayor cotización (histórico)',17396940,'Por validar'],[null,'PL-438-26','SA-6899','SACK',1385463,1658458,'Mayor cotización (histórico)',272995,'Por validar'],[null,'PL-435-26','SA-6900','LEUCA',507124,940462,'Mayor cotización (histórico)',433338,'Por validar'],[null,'PL-434-26','SA-6898','LIKSIC',908856,978757.2,'Mayor cotización (histórico)',69901.2,'Por validar'],[null,'BO-326-26','SA-6909','RODAMENDEZ',673300,1633926.05,'Mayor cotización (histórico)',960626.05,'Por validar'],[null,'CC-0060-26','SA-6927','VEROS',42560,88472,'Mayor cotización (histórico)',45912,'Por validar'],[null,'PL-396-26','SA-6928','VILUZ',901900,1134000,'Mayor cotización (histórico)',232100,'Por validar'],[null,'PL-452-26','SA-6939','LUREYE',3900000,4616340,'Mayor cotización (histórico)',716340,'Por validar'],['2026-09-14','PL-458-26','SA-6951','GOBANTES',29408,73847,'Mayor cotización (histórico)',44439,'Por validar'],['2026-09-15','PL-451-26','SA-6938','SUMINEX',141340,245454,'Mayor cotización (histórico)',104114,'Por validar'],['2026-09-15','BO-228-26','SA-6980','SOINDUS',1760400,3354000,'Mayor cotización (histórico)',1593600,'Por validar']
+    ].map((r,i)=>({id:'hist-'+(i+1),date:r[0],code:r[1],sa:r[2],provider:r[3],amount:r[4],reference:r[5],referenceSource:r[6],saving:r[7],savingValidation:r[8],oc:'',status:'',issueDate:'',commitment:'',reception:'',owner:'',nextAction:'',nextDate:'',unit:'',type:'',currency:'CLP',reason:'',notes:''}));
+
+    const $ = (s,root=document)=>root.querySelector(s); const $$ = (s,root=document)=>[...root.querySelectorAll(s)];
+    const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function' ? globalThis.crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2));
+    const today = () => new Date().toISOString().slice(0,10);
+    const prefixOf = code => String(code||'').trim().toUpperCase().split('-')[0] || 'OTRO';
+    const money = (n,c='CLP') => new Intl.NumberFormat('es-CL',{style:'currency',currency:c||'CLP',maximumFractionDigits:c==='CLP'?0:2}).format(Number(n)||0);
+    const num = n => new Intl.NumberFormat('es-CL',{maximumFractionDigits:1}).format(Number(n)||0);
+    const dateCL = value => value ? new Date(value+'T12:00:00').toLocaleDateString('es-CL') : '—';
+    const esc = value => String(value??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
+    const saDigits = value => String(value??'').replace(/^\s*SA\s*-?\s*/i,'').replace(/\D/g,'');
+    const formatSA = value => {const digits=saDigits(value);return digits?`SA-${digits}`:''};
+    function loadState(){try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));if(saved&&Array.isArray(saved.orders))return saved}catch(e){}return {orders:initialOrders,comparisons:[]}}
+    function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));return true}catch(e){toast('El navegador permite rellenar, pero bloqueó el guardado local. Descargue el Excel como respaldo.',true);return false}}
+    function ensureEditable(root=document){root.querySelectorAll('input,select,textarea').forEach(el=>{el.disabled=false;el.readOnly=false;el.removeAttribute('aria-disabled');el.style.pointerEvents='auto'});return true}
+    function blankComparison(){return {id:'',date:today(),code:'',sa:'',currency:'CLP',unit:'',requester:'',sourceFile:'',specifications:'',items:[{id:uid(),code:'',description:'',qty:1,unit:'unidad'}],suppliers:[newSupplier(),newSupplier(),newSupplier()],selectedSupplierId:'',reason:''}}
+    function newSupplier(){return {id:uid(),name:'',delivery:'',payment:'',prices:{}}}
+    let state = loadState();
+    let comparison = blankComparison();
+    function toast(message,error=false){const t=$('#toast');t.textContent=message;t.className='toast show'+(error?' error':'');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.className='toast',3200)}
+    function activateView(id){$$('.view').forEach(v=>v.classList.toggle('active',v.id===id));$$('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===id));if(id==='seguimiento')renderOrders();if(id==='dashboard')renderDashboard();window.scrollTo({top:0,behavior:'smooth'})}
+    $$('.nav-btn').forEach(b=>b.addEventListener('click',()=>activateView(b.dataset.view)));
+
+    function syncComparisonFromForm(){comparison.code=$('#cmpCode').value.trim();comparison.sa=formatSA($('#cmpSA').value);comparison.date=$('#cmpDate').value;comparison.currency=$('#cmpCurrency').value;comparison.unit=$('#cmpUnit').value.trim();comparison.requester=$('#cmpRequester').value.trim();comparison.specifications=$('#cmpSpecifications').value.trim();comparison.selectedSupplierId=$('#selectedSupplier').value;comparison.reason=$('#decisionReason').value.trim()}
+    function setComparisonForm(){$('#cmpCode').value=comparison.code||'';$('#cmpSA').value=saDigits(comparison.sa);$('#cmpDate').value=comparison.date||today();$('#cmpCurrency').value=comparison.currency||'CLP';$('#cmpUnit').value=comparison.unit||'';$('#cmpRequester').value=comparison.requester||'';$('#cmpSpecifications').value=comparison.specifications||'';$('#decisionReason').value=comparison.reason||'';renderItems();renderSuppliers()}
+    function renderItems(){const body=$('#itemsBody');body.innerHTML=comparison.items.map((item,i)=>`<tr><td class="center">${i+1}</td><td><input data-item="${item.id}" data-field="code" value="${esc(item.code||'')}" placeholder="Código producto"></td><td><input data-item="${item.id}" data-field="description" value="${esc(item.description)}" placeholder="Descripción del producto o servicio"></td><td><input data-item="${item.id}" data-field="qty" type="number" inputmode="decimal" min="0" step="any" value="${item.qty}"></td><td><input data-item="${item.id}" data-field="unit" value="${esc(item.unit)}"></td><td class="center"><button type="button" class="btn btn-danger btn-sm" data-remove-item="${item.id}" ${comparison.items.length===1?'disabled':''}>Quitar</button></td></tr>`).join('');
+      $$('[data-item]',body).forEach(inp=>inp.addEventListener('input',e=>{const item=comparison.items.find(x=>x.id===e.target.dataset.item);item[e.target.dataset.field]=e.target.dataset.field==='qty'?Number(e.target.value):e.target.value;renderSuppliers()}));
+      $$('[data-remove-item]',body).forEach(btn=>btn.addEventListener('click',()=>{comparison.items=comparison.items.filter(x=>x.id!==btn.dataset.removeItem);comparison.suppliers.forEach(s=>{delete s.prices[btn.dataset.removeItem]});renderItems();renderSuppliers()}));ensureEditable(body);
+    }
+    $('#addItem').addEventListener('click',()=>{comparison.items.push({id:uid(),code:'',description:'',qty:1,unit:'unidad'});renderItems();renderSuppliers()});
+    function supplierTotal(s){return comparison.items.reduce((a,item)=>a+(Number(item.qty)||0)*(Number(s.prices[item.id])||0),0)}
+    function validSupplierTotals(){return comparison.suppliers.filter(s=>s.name.trim()&&supplierTotal(s)>0).map(s=>({id:s.id,name:s.name,total:supplierTotal(s)}))}
+    function renderSuppliers(){const totals=validSupplierTotals();const minTotal=totals.length?Math.min(...totals.map(x=>x.total)):0;const strip=$('#supplierStrip');strip.innerHTML=comparison.suppliers.map((s,idx)=>{const total=supplierTotal(s);return `<article class="supplier-card ${total&&total===minTotal?'winner':''}"><div class="supplier-title"><strong>Proveedor ${idx+1}</strong>${comparison.suppliers.length>2?`<button type="button" class="btn btn-danger btn-sm" data-remove-supplier="${s.id}">Quitar</button>`:''}</div><div class="supplier-fields"><label>Nombre<input data-supplier="${s.id}" data-sfield="name" value="${esc(s.name)}" placeholder="Razón social"></label><label>Plazo entrega<input data-supplier="${s.id}" data-sfield="delivery" value="${esc(s.delivery)}" placeholder="Ej. 15 días"></label><label style="grid-column:1/-1">Forma de pago<input data-supplier="${s.id}" data-sfield="payment" value="${esc(s.payment)}" placeholder="Ej. OC30"></label></div><div class="supplier-prices"><table><thead><tr><th>Ítem</th><th>Precio unitario</th><th>Total</th></tr></thead><tbody>${comparison.items.map((item,i)=>`<tr><td>${i+1}. ${esc(item.description||'Sin descripción')}</td><td><input data-price-supplier="${s.id}" data-price-item="${item.id}" type="number" inputmode="decimal" min="0" step="any" value="${s.prices[item.id]??''}" placeholder="0"></td><td class="num">${money((Number(item.qty)||0)*(Number(s.prices[item.id])||0),comparison.currency)}</td></tr>`).join('')}</tbody></table></div><div class="supplier-total"><span>Total oferta</span><span>${money(total,comparison.currency)}</span></div></article>`}).join('');
+      $$('[data-supplier]',strip).forEach(inp=>inp.addEventListener('input',e=>{const s=comparison.suppliers.find(x=>x.id===e.target.dataset.supplier);s[e.target.dataset.sfield]=e.target.value;refreshDecision()}));
+      $$('[data-price-supplier]',strip).forEach(inp=>inp.addEventListener('change',e=>{const s=comparison.suppliers.find(x=>x.id===e.target.dataset.priceSupplier);s.prices[e.target.dataset.priceItem]=Number(e.target.value)||0;renderSuppliers()}));
+      $$('[data-remove-supplier]',strip).forEach(btn=>btn.addEventListener('click',()=>{comparison.suppliers=comparison.suppliers.filter(x=>x.id!==btn.dataset.removeSupplier);if(comparison.selectedSupplierId===btn.dataset.removeSupplier)comparison.selectedSupplierId='';renderSuppliers()}));refreshDecision();ensureEditable(strip);
+    }
+    $('#addSupplier').addEventListener('click',()=>{if(comparison.suppliers.length>=5)return toast('El máximo es de cinco proveedores.',true);comparison.suppliers.push(newSupplier());renderSuppliers()});
+    function refreshDecision(){const select=$('#selectedSupplier');const previous=comparison.selectedSupplierId||select.value;const totals=validSupplierTotals();select.innerHTML='<option value="">Seleccione</option>'+totals.map(x=>`<option value="${x.id}">${esc(x.name)} — ${money(x.total,comparison.currency)}</option>`).join('');if(totals.some(x=>x.id===previous)){select.value=previous;comparison.selectedSupplierId=previous}else comparison.selectedSupplierId='';const box=$('#recommendation');if(!totals.length){box.className='recommendation';box.textContent='Complete las ofertas para obtener una recomendación.';return}const min=Math.min(...totals.map(x=>x.total));const best=totals.find(x=>x.total===min);const selected=totals.find(x=>x.id===select.value);if(!selected){box.className='recommendation';box.innerHTML=`Menor oferta: <strong>${esc(best.name)}</strong><br>${money(best.total,comparison.currency)}`;return}if(selected.id===best.id){box.className='recommendation';box.innerHTML=`Selección de menor precio<br><strong>${money(selected.total,comparison.currency)}</strong>`}else{box.className='recommendation warning';box.innerHTML=`Diferencia frente al menor precio<br><strong>${money(selected.total-best.total,comparison.currency)}</strong>`}}
+    $('#selectedSupplier').addEventListener('change',e=>{comparison.selectedSupplierId=e.target.value;refreshDecision()});$('#decisionReason').addEventListener('input',e=>comparison.reason=e.target.value);$('#cmpCurrency').addEventListener('change',e=>{comparison.currency=e.target.value;renderSuppliers()});
+    $('#cmpSA').addEventListener('input',e=>{const digits=saDigits(e.target.value);if(e.target.value!==digits)e.target.value=digits;comparison.sa=formatSA(digits)});
+    $('#newComparison').addEventListener('click',()=>{comparison=blankComparison();setComparisonForm();toast('Nuevo comparativo listo.')});
+
+    let pendingImport=null;
+    function parseXml(text,label){const doc=new DOMParser().parseFromString(text,'application/xml');if(doc.getElementsByTagName('parsererror').length)throw new Error(`No fue posible leer ${label}.`);return doc}
+    async function unzipEntry(bytes,entry){const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);if(view.getUint32(entry.offset,true)!==0x04034b50)throw new Error('El archivo Excel contiene una entrada inválida.');const nameLength=view.getUint16(entry.offset+26,true),extraLength=view.getUint16(entry.offset+28,true);const start=entry.offset+30+nameLength+extraLength;const data=bytes.slice(start,start+entry.size);if(entry.method===0)return data;if(entry.method!==8)throw new Error('El método de compresión del Excel no es compatible.');if(typeof DecompressionStream!=='function')throw new Error('Este navegador no puede descomprimir el Excel. Use una versión reciente de Chrome o Edge.');const stream=new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'));return new Uint8Array(await new Response(stream).arrayBuffer())}
+    async function openXlsx(file){const bytes=new Uint8Array(await file.arrayBuffer());const view=new DataView(bytes.buffer);let end=-1;for(let i=bytes.length-22;i>=Math.max(0,bytes.length-65557);i--){if(view.getUint32(i,true)===0x06054b50){end=i;break}}if(end<0)throw new Error('El archivo no es un Excel .xlsx válido.');const count=view.getUint16(end+10,true),directory=view.getUint32(end+16,true),entries=new Map();let pos=directory;for(let i=0;i<count;i++){if(view.getUint32(pos,true)!==0x02014b50)throw new Error('No fue posible leer la estructura interna del Excel.');const method=view.getUint16(pos+10,true),size=view.getUint32(pos+20,true),nameLength=view.getUint16(pos+28,true),extraLength=view.getUint16(pos+30,true),commentLength=view.getUint16(pos+32,true),offset=view.getUint32(pos+42,true);const name=new TextDecoder().decode(bytes.slice(pos+46,pos+46+nameLength));entries.set(name,{method,size,offset});pos+=46+nameLength+extraLength+commentLength}const text=async name=>{const entry=entries.get(name);if(!entry)throw new Error(`Falta ${name} dentro del archivo.`);return new TextDecoder().decode(await unzipEntry(bytes,entry))};return {entries,text}}
+    function relationshipId(node){return node.getAttribute('r:id')||[...node.attributes].find(a=>a.localName==='id')?.value||''}
+    function excelDate(value){const text=String(value??'').trim();const direct=text.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);if(direct)return `${direct[3]}-${direct[2].padStart(2,'0')}-${direct[1].padStart(2,'0')}`;if(/^\d{4}-\d{2}-\d{2}/.test(text))return text.slice(0,10);const serial=Number(text);if(Number.isFinite(serial)&&serial>20000){const date=new Date(Date.UTC(1899,11,30)+Math.floor(serial)*86400000);return date.toISOString().slice(0,10)}return ''}
+    async function readSolicitud(file){const nodes=(doc,name)=>[...doc.getElementsByTagName(name)];const zip=await openXlsx(file);const workbook=parseXml(await zip.text('xl/workbook.xml'),'el libro');const sheet=nodes(workbook,'sheet').find(s=>s.getAttribute('name')?.trim().toUpperCase()==='SOLICITUD');if(!sheet)throw new Error('No se encontró una hoja llamada SOLICITUD.');const rels=parseXml(await zip.text('xl/_rels/workbook.xml.rels'),'las relaciones del libro');const rel=nodes(rels,'Relationship').find(r=>r.getAttribute('Id')===relationshipId(sheet));if(!rel)throw new Error('No se pudo ubicar la hoja SOLICITUD.');let target=rel.getAttribute('Target')||'';target=target.startsWith('/')?target.slice(1):'xl/'+target.replace(/^\.\//,'');target=target.replace(/\/\.\//g,'/');const shared=[];if(zip.entries.has('xl/sharedStrings.xml')){const sharedDoc=parseXml(await zip.text('xl/sharedStrings.xml'),'los textos compartidos');shared.push(...nodes(sharedDoc,'si').map(si=>nodes(si,'t').map(t=>t.textContent||'').join('')))}const sheetDoc=parseXml(await zip.text(target),'la hoja SOLICITUD');const cells=new Map();nodes(sheetDoc,'c').forEach(cell=>{const ref=cell.getAttribute('r');const type=cell.getAttribute('t');let value='';if(type==='inlineStr')value=nodes(cell,'t').map(t=>t.textContent||'').join('');else{const raw=nodes(cell,'v')[0]?.textContent??'';value=type==='s'?shared[Number(raw)]??'':raw}cells.set(ref,value)});const cell=ref=>String(cells.get(ref)??'').trim();const items=[];for(let row=13;row<=37;row++){const description=cell(`G${row}`),code=cell(`D${row}`),unit=cell(`E${row}`),qtyRaw=cell(`F${row}`);if(!description&&!code&&!qtyRaw)continue;items.push({number:cell(`C${row}`)||String(items.length+1),code,description,qty:Number(qtyRaw)||0,unit})}const result={code:cell('J3'),date:excelDate(cell('G5')),area:cell('E7'),requester:cell('C5'),provider:cell('C9'),specifications:cell('C40'),items};if(!result.code&&!result.requester&&!items.length)throw new Error('La hoja SOLICITUD no contiene datos en las celdas esperadas.');return result}
+    function showImportPreview(data,file){pendingImport={data,fileName:file.name};$('#requestFileName').textContent=file.name;$('#importStatus').className='import-status';$('#importStatus').textContent=`Lectura completa: ${data.items.length} ítem(s) detectado(s). Revise la vista previa.`;const facts=[['Código',data.code||'No encontrado'],['Fecha',data.date?dateCL(data.date):'No encontrada'],['Área solicitante',data.area||'No encontrada'],['Solicitante',data.requester||'No encontrado'],['Proveedor sugerido',data.provider||'No encontrado'],['SA','Ingreso manual']];$('#importFacts').innerHTML=facts.map(([label,value])=>`<div class="preview-fact"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`).join('');$('#importItems').innerHTML=data.items.length?data.items.map((item,i)=>`<tr><td class="center">${esc(item.number||i+1)}</td><td>${esc(item.code||'—')}</td><td>${esc(item.description||'—')}</td><td class="num">${num(item.qty)}</td><td>${esc(item.unit||'—')}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">No se detectaron ítems.</td></tr>';$('#importSpecifications').innerHTML=`<strong>Especificaciones:</strong> ${esc(data.specifications||'No informadas')}`;$('#importPreview').classList.remove('hidden')}
+    function resetImport(){pendingImport=null;$('#requestFile').value='';$('#requestFileName').textContent='Ningún archivo seleccionado';$('#importStatus').textContent='';$('#importStatus').className='import-status';$('#importPreview').classList.add('hidden')}
+    $('#chooseRequestFile').addEventListener('click',()=>$('#requestFile').click());
+    $('#requestFile').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;if(!/\.xlsx$/i.test(file.name)){resetImport();return toast('Seleccione un archivo Excel con extensión .xlsx.',true)}$('#requestFileName').textContent=file.name;$('#importStatus').className='import-status';$('#importStatus').textContent='Leyendo archivo…';$('#importPreview').classList.add('hidden');try{showImportPreview(await readSolicitud(file),file)}catch(error){pendingImport=null;$('#importStatus').className='import-status error';$('#importStatus').textContent=error.message||'No fue posible leer el archivo.';toast($('#importStatus').textContent,true)}});
+    $('#cancelImport').addEventListener('click',resetImport);
+    $('#applyImport').addEventListener('click',()=>{if(!pendingImport)return toast('Seleccione y revise un archivo primero.',true);syncComparisonFromForm();const hasData=comparison.code||comparison.requester||comparison.items.some(item=>item.description||item.code)||comparison.suppliers.some(s=>s.name||Object.values(s.prices).some(Boolean));if(hasData&&!confirm('¿Reemplazar los datos actuales del comparativo con la solicitud importada?'))return;const data=pendingImport.data,next=blankComparison();next.code=data.code;next.date=data.date||today();next.unit=data.area;next.requester=data.requester;next.sourceFile=pendingImport.fileName;next.specifications=data.specifications;next.items=data.items.length?data.items.map(item=>({id:uid(),code:item.code,description:item.description,qty:item.qty||1,unit:item.unit||'unidad'})):next.items;if(data.provider)next.suppliers[0].name=data.provider;comparison=next;setComparisonForm();toast(`Solicitud ${data.code||''} importada. Complete SA, precios y condiciones.`);document.querySelector('#cmpCode').scrollIntoView({behavior:'smooth',block:'center'})});
+
+    function validateComparison(){syncComparisonFromForm();if(!comparison.code)return 'Ingrese el código de la solicitud.';if(!comparison.items.some(i=>i.description.trim()&&Number(i.qty)>0))return 'Ingrese al menos un ítem válido.';const totals=validSupplierTotals();if(totals.length<2)return 'Registre al menos dos ofertas completas.';const selected=totals.find(x=>x.id===comparison.selectedSupplierId);if(!selected)return 'Seleccione el proveedor adjudicado.';const min=Math.min(...totals.map(x=>x.total));if(selected.total>min&&!comparison.reason.trim())return 'Debe justificar la elección de un proveedor distinto al de menor precio.';return ''}
+    function saveComparison(addTracking=false){const error=validateComparison();if(error){toast(error,true);return null}const copy=JSON.parse(JSON.stringify(comparison));copy.id=copy.id||uid();copy.savedAt=new Date().toISOString();const idx=state.comparisons.findIndex(x=>x.id===copy.id);if(idx>=0)state.comparisons[idx]=copy;else state.comparisons.unshift(copy);comparison=copy;if(addTracking)upsertOrderFromComparison(copy);persist();renderHistory();toast(addTracking?'Comparativo guardado y enviado a seguimiento.':'Comparativo guardado.');return copy}
+    $('#saveComparison').addEventListener('click',()=>saveComparison(false));$('#saveAndTrack').addEventListener('click',()=>saveComparison(true));
+    function upsertOrderFromComparison(c){const totals=c.suppliers.filter(s=>s.name&&supplierTotalFor(c,s)>0).map(s=>({id:s.id,name:s.name,total:supplierTotalFor(c,s)}));const selected=totals.find(x=>x.id===c.selectedSupplierId);const reference=Math.max(...totals.map(x=>x.total));let order=state.orders.find(o=>o.code.toUpperCase()===c.code.toUpperCase());if(!order){order={id:uid(),date:c.date,code:c.code,sa:c.sa,provider:selected.name,amount:selected.total,reference,referenceSource:'Mayor cotización',saving:reference-selected.total,savingValidation:'Por validar',oc:'',status:'Por emitir',issueDate:'',commitment:'',reception:'',owner:'',nextAction:'Emitir orden de compra',nextDate:'',unit:c.unit,type:'',currency:c.currency,reason:c.reason,notes:''};state.orders.unshift(order)}else{Object.assign(order,{date:c.date||order.date,sa:c.sa||order.sa,provider:selected.name,amount:selected.total,reference,saving:reference-selected.total,reason:c.reason||order.reason,unit:c.unit||order.unit,currency:c.currency||order.currency})}}
+    function supplierTotalFor(c,s){return c.items.reduce((a,item)=>a+(Number(item.qty)||0)*(Number(s.prices[item.id])||0),0)}
+    function renderHistory(){const root=$('#comparisonHistory');if(!state.comparisons.length){root.innerHTML='<div class="empty">Aún no hay comparativos guardados.</div>';return}root.innerHTML=state.comparisons.map(c=>{const s=c.suppliers.find(x=>x.id===c.selectedSupplierId);return `<div class="history-item"><div><strong>${esc(c.code)}</strong> · ${esc(s?.name||'Sin adjudicar')}<br><small>${dateCL(c.date)} · ${c.items.length} ítem(s)</small></div><div class="toolbar"><button class="btn btn-secondary btn-sm" data-load-cmp="${c.id}">Abrir</button><button class="btn btn-danger btn-sm" data-delete-cmp="${c.id}">Eliminar</button></div></div>`}).join('');$$('[data-load-cmp]',root).forEach(b=>b.addEventListener('click',()=>{comparison=JSON.parse(JSON.stringify(state.comparisons.find(x=>x.id===b.dataset.loadCmp)));setComparisonForm();window.scrollTo({top:0,behavior:'smooth'})}));$$('[data-delete-cmp]',root).forEach(b=>b.addEventListener('click',()=>{if(confirm('¿Eliminar este comparativo?')){state.comparisons=state.comparisons.filter(x=>x.id!==b.dataset.deleteCmp);persist();renderHistory()}}))}
+
+    function downloadBlob(content,type,name){const blob=content instanceof Blob?content:new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}
+    const xmlCell=(v,type='String')=>`<Cell><Data ss:Type="${type}">${esc(v)}</Data></Cell>`;
+    function excelXml(sheets){return `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">${sheets.map(s=>`<Worksheet ss:Name="${esc(s.name)}"><Table>${s.rows.map(row=>`<Row>${row.map(c=>xmlCell(c.v,c.t||'String')).join('')}</Row>`).join('')}</Table></Worksheet>`).join('')}</Workbook>`}
+    function exportComparisonExcel(){const error=validateComparison();if(error)return toast(error,true);const totals=validSupplierTotals();const selected=totals.find(x=>x.id===comparison.selectedSupplierId);const rows=[
+      [{v:'CUADRO COMPARATIVO'}],[{v:'Código'},{v:comparison.code},{v:'SA'},{v:comparison.sa}],[{v:'Fecha'},{v:comparison.date},{v:'Moneda'},{v:comparison.currency}],[{v:'Unidad / área'},{v:comparison.unit},{v:'Solicitante'},{v:comparison.requester}],[{v:'Archivo de origen'},{v:comparison.sourceFile||''}],[{v:'Especificaciones'},{v:comparison.specifications||''}],[],[{v:'Proveedor adjudicado'},{v:selected.name},{v:'Monto adjudicado',},{v:selected.total,t:'Number'}],[{v:'Motivo'},{v:comparison.reason||'Precio'}]
+    ];
+    const detail=[[{v:'N°'},{v:'Código'},{v:'Descripción'},{v:'Cantidad'},{v:'Unidad'},...comparison.suppliers.flatMap(s=>[{v:s.name||'Proveedor'},{v:'Total '+(s.name||'')}])]];
+    comparison.items.forEach((item,i)=>detail.push([{v:i+1,t:'Number'},{v:item.code||''},{v:item.description},{v:item.qty,t:'Number'},{v:item.unit},...comparison.suppliers.flatMap(s=>[{v:Number(s.prices[item.id])||0,t:'Number'},{v:(Number(item.qty)||0)*(Number(s.prices[item.id])||0),t:'Number'}])]));
+    detail.push([{v:''},{v:''},{v:'TOTAL'},{v:''},{v:''},...comparison.suppliers.flatMap(s=>[{v:''},{v:supplierTotal(s),t:'Number'}])]);
+    downloadBlob(excelXml([{name:'Resumen',rows},{name:'Detalle ofertas',rows:detail}]),'application/vnd.ms-excel;charset=utf-8',`Comparativo_${comparison.code}.xls`)}
+    $('#exportComparisonExcel').addEventListener('click',exportComparisonExcel);
+    function prepareComparisonPrint(){const error=validateComparison();if(error)return toast(error,true);const totals=validSupplierTotals();const selected=totals.find(x=>x.id===comparison.selectedSupplierId);const min=Math.min(...totals.map(x=>x.total));const reference=Math.max(...totals.map(x=>x.total));const saving=Math.max(0,reference-selected.total);const savingMargin=reference>0?saving/reference*100:0;$('#printArea').innerHTML=`<h1 class="print-title">Cuadro comparativo de ofertas</h1><div class="print-meta"><div class="print-box"><strong>Código</strong><br>${esc(comparison.code)}</div><div class="print-box"><strong>SA</strong><br>${esc(comparison.sa||'—')}</div><div class="print-box"><strong>Fecha</strong><br>${dateCL(comparison.date)}</div><div class="print-box"><strong>Unidad / área</strong><br>${esc(comparison.unit||'—')}</div></div><table class="print-table"><thead><tr><th>N°</th><th>Código</th><th>Descripción</th><th>Cantidad</th><th>Unidad</th>${comparison.suppliers.map(s=>`<th>${esc(s.name||'Proveedor')}</th>`).join('')}</tr></thead><tbody>${comparison.items.map((item,i)=>`<tr><td>${i+1}</td><td>${esc(item.code||'—')}</td><td>${esc(item.description)}</td><td class="num">${num(item.qty)}</td><td>${esc(item.unit)}</td>${comparison.suppliers.map(s=>`<td class="num">${money((Number(item.qty)||0)*(Number(s.prices[item.id])||0),comparison.currency)}</td>`).join('')}</tr>`).join('')}<tr><td colspan="5"><strong>Total oferta</strong></td>${comparison.suppliers.map(s=>`<td class="num"><strong>${money(supplierTotal(s),comparison.currency)}</strong></td>`).join('')}</tr></tbody></table>${comparison.specifications?`<div class="print-note"><strong>Especificaciones adicionales:</strong> ${esc(comparison.specifications)}</div>`:''}<div class="print-note"><strong>Proveedor adjudicado:</strong> ${esc(selected.name)} · ${money(selected.total,comparison.currency)}<br><strong>Ahorro generado:</strong> ${money(saving,comparison.currency)}<br><strong>Margen de ahorro:</strong> ${num(savingMargin)}%<br><strong>Base de cálculo:</strong> mayor cotización (${money(reference,comparison.currency)})<br><strong>Diferencia frente al menor precio:</strong> ${money(selected.total-min,comparison.currency)}<br><strong>Motivo:</strong> ${esc(comparison.reason||'Menor precio')}</div>`;window.print()}
+    $('#exportComparisonPdf').addEventListener('click',prepareComparisonPrint);
+
+    function savingOf(o){return Number.isFinite(Number(o.saving))?Number(o.saving):Math.max(0,(Number(o.reference)||0)-(Number(o.amount)||0))}
+    function semaphore(o){if(!o.code)return 'Sin registro';if(!o.status)return 'Sin estado';if(['Cumplida','Cerrada','Forzada','Anulada'].includes(o.status))return 'Cerrada';if(!o.commitment)return 'Sin compromiso';const end=new Date(o.commitment+'T23:59:59');const days=Math.ceil((end-new Date())/86400000);if(days<0)return 'Atrasada';if(days<=7)return 'Por vencer';return 'En plazo'}
+    function statusClass(text){if(text==='Atrasada')return 'status-red';if(text==='Por vencer'||text==='Por validar')return 'status-amber';if(text==='En plazo'||text==='Validado'||text==='Cerrada')return 'status-green';if(text==='Sin estado'||text==='Sin compromiso')return 'status-gray';return 'status-blue'}
+    function renderOrders(){const q=$('#orderSearch').value.trim().toLowerCase();const sf=$('#orderStatusFilter').value;const rows=state.orders.filter(o=>(!sf||o.status===sf)&&(!q||[o.code,o.sa,o.provider,o.oc].some(v=>String(v||'').toLowerCase().includes(q))));const body=$('#ordersBody');if(!rows.length){body.innerHTML='<tr><td colspan="12" class="empty">No hay registros para los filtros seleccionados.</td></tr>';return}body.innerHTML=rows.map(o=>{const sem=semaphore(o);return `<tr><td class="nowrap"><strong>${esc(o.code)}</strong></td><td class="center">${esc(prefixOf(o.code))}</td><td>${esc(o.sa||'—')}</td><td>${esc(o.provider)}</td><td class="num">${money(o.amount,o.currency)}</td><td class="num">${money(savingOf(o),o.currency)}</td><td>${esc(o.oc||'—')}</td><td><span class="status ${statusClass(o.status||'Sin estado')}">${esc(o.status||'Sin estado')}</span></td><td>${dateCL(o.commitment)}</td><td><span class="status ${statusClass(sem)}">${sem}</span></td><td>${esc(o.owner||'—')}</td><td><div class="toolbar"><button class="btn btn-secondary btn-sm" data-edit-order="${o.id}">Editar</button><button class="btn btn-danger btn-sm" data-delete-order="${o.id}">Eliminar</button></div></td></tr>`}).join('');$$('[data-edit-order]',body).forEach(b=>b.addEventListener('click',()=>openOrder(state.orders.find(o=>o.id===b.dataset.editOrder))));$$('[data-delete-order]',body).forEach(b=>b.addEventListener('click',()=>{if(confirm('¿Eliminar este registro de orden?')){state.orders=state.orders.filter(o=>o.id!==b.dataset.deleteOrder);persist();renderOrders();toast('Registro eliminado.')}}))}
+    $('#orderSearch').addEventListener('input',renderOrders);$('#orderStatusFilter').addEventListener('change',renderOrders);
+    const orderFields=['date','code','sa','provider','amount','reference','referenceSource','savingValidation','oc','status','issueDate','commitment','reception','owner','nextAction','nextDate','unit','type','currency','reason','notes'];
+    function openOrder(o=null){const data=o||{id:'',date:today(),code:'',sa:'',provider:'',amount:'',reference:'',referenceSource:'Mayor cotización',savingValidation:'Por validar',oc:'',status:'',issueDate:'',commitment:'',reception:'',owner:'',nextAction:'',nextDate:'',unit:'',type:'',currency:'CLP',reason:'',notes:''};$('#orderId').value=data.id;orderFields.forEach(f=>{const el=$('#order'+f.charAt(0).toUpperCase()+f.slice(1));if(el)el.value=data[f]??''});$('#orderModalTitle').textContent=o?'Editar orden':'Registrar orden';ensureEditable($('#orderModal'));$('#orderModal').classList.add('open');setTimeout(()=>$('#orderCode').focus(),80)}
+    function closeOrder(){$('#orderModal').classList.remove('open')}
+    $('#openOrderModal').addEventListener('click',()=>openOrder());$('#closeOrderModal').addEventListener('click',closeOrder);$('#cancelOrder').addEventListener('click',closeOrder);$('#orderModal').addEventListener('click',e=>{if(e.target.id==='orderModal')closeOrder()});
+    $('#saveOrder').addEventListener('click',()=>{const data={id:$('#orderId').value||uid()};orderFields.forEach(f=>{const el=$('#order'+f.charAt(0).toUpperCase()+f.slice(1));data[f]=el?el.value:''});data.amount=Number(data.amount)||0;data.reference=Number(data.reference)||0;data.saving=data.reference-data.amount;if(!data.code.trim()||!data.provider.trim())return toast('Código y proveedor son obligatorios.',true);const idx=state.orders.findIndex(o=>o.id===data.id);if(idx>=0)state.orders[idx]={...state.orders[idx],...data};else state.orders.unshift(data);persist();closeOrder();renderOrders();toast('Orden guardada.')});
+    $('#exportOrdersExcel').addEventListener('click',()=>{const header=['Fecha','Código','Prefijo','SA','Proveedor','Monto adjudicado','Monto referencia','Ahorro','Validación ahorro','N° OC','Estado','Fecha emisión','Fecha compromiso','Fecha recepción','Semáforo','Responsable','Próxima acción','Unidad / área','Tipo compra','Moneda','Motivo','Observaciones'];const rows=[[...header.map(v=>({v}))],...state.orders.map(o=>[{v:o.date},{v:o.code},{v:prefixOf(o.code)},{v:o.sa},{v:o.provider},{v:Number(o.amount)||0,t:'Number'},{v:Number(o.reference)||0,t:'Number'},{v:savingOf(o),t:'Number'},{v:o.savingValidation},{v:o.oc},{v:o.status},{v:o.issueDate},{v:o.commitment},{v:o.reception},{v:semaphore(o)},{v:o.owner},{v:o.nextAction},{v:o.unit},{v:o.type},{v:o.currency},{v:o.reason},{v:o.notes}])];downloadBlob(excelXml([{name:'Registro OC',rows}]),'application/vnd.ms-excel;charset=utf-8','Registro_Ordenes_Compra.xls')});
+
+    function filteredOrders(){const p=$('#dashPrefix').value,s=$('#dashStatus').value;return state.orders.filter(o=>(!p||prefixOf(o.code)===p)&&(!s||o.status===s))}
+    function renderDashboard(){const prefixes=[...new Set(state.orders.map(o=>prefixOf(o.code)))].sort();const ps=$('#dashPrefix'),ss=$('#dashStatus');const pv=ps.value,sv=ss.value;ps.innerHTML='<option value="">Todos</option>'+prefixes.map(p=>`<option>${p}</option>`).join('');ss.innerHTML='<option value="">Todos</option>'+statuses.map(s=>`<option>${s}</option>`).join('')+'<option value="Sin estado">Sin estado</option>';if(prefixes.includes(pv))ps.value=pv;if(statuses.includes(sv)||sv==='Sin estado')ss.value=sv;const orders=filteredOrders();const total=orders.length,amount=orders.reduce((a,o)=>a+(Number(o.amount)||0),0),saving=orders.reduce((a,o)=>a+savingOf(o),0),validated=orders.filter(o=>o.savingValidation==='Validado').reduce((a,o)=>a+savingOf(o),0),tracking=orders.filter(o=>o.status).length,late=orders.filter(o=>semaphore(o)==='Atrasada').length,incomplete=orders.filter(o=>!o.date||!o.sa||!o.provider||!o.amount||!o.status).length;$('#kpiGrid').innerHTML=[["Solicitudes",num(total)],["Monto adjudicado",money(amount)],["Ahorro informado",money(saving)],["Ahorro validado",money(validated)],["Órdenes atrasadas",num(late)],["Registros incompletos",num(incomplete)]].map(x=>`<div class="kpi"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join('');
+      const byPrefix={};orders.forEach(o=>{const p=prefixOf(o.code);byPrefix[p]??={count:0,amount:0,saving:0,validated:0,late:0};byPrefix[p].count++;byPrefix[p].amount+=Number(o.amount)||0;byPrefix[p].saving+=savingOf(o);if(o.savingValidation==='Validado')byPrefix[p].validated+=savingOf(o);if(semaphore(o)==='Atrasada')byPrefix[p].late++});const prefixRows=Object.entries(byPrefix).sort((a,b)=>b[1].amount-a[1].amount);renderBars('#prefixChart',prefixRows.map(([label,v])=>({label,value:v.amount,display:money(v.amount)})));$('#prefixTable').innerHTML=prefixRows.length?prefixRows.map(([p,v])=>`<tr><td><strong>${p}</strong></td><td class="num">${v.count}</td><td class="num">${money(v.amount)}</td><td class="num">${money(v.saving)}</td><td class="num">${money(v.validated)}</td><td class="num">${v.late}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Sin datos.</td></tr>';
+      const byStatus={};orders.forEach(o=>{const s=o.status||'Sin estado';byStatus[s]=(byStatus[s]||0)+1});renderBars('#statusChart',Object.entries(byStatus).sort((a,b)=>b[1]-a[1]).map(([label,value])=>({label,value,display:num(value)})));
+      const quality=[['Sin fecha de registro',orders.filter(o=>!o.date).length],['Sin SA',orders.filter(o=>!o.sa).length],['Sin estado de orden',orders.filter(o=>!o.status).length],['Sin fecha de compromiso',orders.filter(o=>o.status&&!o.commitment&&!['Cumplida','Cerrada','Forzada','Anulada'].includes(o.status)).length],['Ahorro por validar',orders.filter(o=>o.savingValidation==='Por validar').length]];$('#qualityList').innerHTML=quality.map(x=>`<div class="quality-row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join('')}
+    function renderBars(selector,data){const root=$(selector);if(!data.length){root.innerHTML='<div class="empty">Sin datos para mostrar.</div>';return}const max=Math.max(...data.map(x=>x.value),1);root.innerHTML=data.map(x=>`<div class="bar-row"><strong>${esc(x.label)}</strong><div class="bar-track"><div class="bar-fill" style="width:${Math.max(1,x.value/max*100)}%"></div></div><span class="num">${x.display}</span></div>`).join('')}
+    $('#dashPrefix').addEventListener('change',renderDashboard);$('#dashStatus').addEventListener('change',renderDashboard);
+
+    function registerWebMcp(){const context=document.modelContext;if(!context?.registerTool)return;const controller=new AbortController();const safeRegister=tool=>Promise.resolve(context.registerTool(tool,{signal:controller.signal})).catch(()=>{});safeRegister({name:'get_procurement_dashboard',title:'Consultar dashboard de adquisiciones',description:'Devuelve los indicadores actuales del registro de órdenes de compra.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:false},execute(){const orders=state.orders;return {requests:orders.length,awardedAmount:orders.reduce((a,o)=>a+(Number(o.amount)||0),0),reportedSaving:orders.reduce((a,o)=>a+savingOf(o),0),lateOrders:orders.filter(o=>semaphore(o)==='Atrasada').length}}});safeRegister({name:'add_purchase_order_record',title:'Registrar orden de compra',description:'Agrega una orden al mismo registro visible en la sección Seguimiento OC.',inputSchema:{type:'object',properties:{code:{type:'string'},provider:{type:'string'},amount:{type:'number'},sa:{type:'string'},status:{type:'string'}},required:['code','provider','amount'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!input.code||!input.provider||!(input.amount>=0))throw new Error('Código, proveedor y monto son obligatorios.');const o={id:uid(),date:today(),code:input.code,sa:input.sa||'',provider:input.provider,amount:input.amount,reference:input.amount,saving:0,referenceSource:'Otro',savingValidation:'Por validar',oc:'',status:input.status||'Por emitir',issueDate:'',commitment:'',reception:'',owner:'',nextAction:'',nextDate:'',unit:'',type:'',currency:'CLP',reason:'',notes:''};state.orders.unshift(o);persist();renderOrders();renderDashboard();return {id:o.id,status:'saved'}}})}
+
+    $('#editModeBtn').textContent='Edición lista';
+    $('#editModeBtn').addEventListener('click',()=>{ensureEditable();$('#cmpCode').focus();toast('Edición habilitada. Ya puede escribir y seleccionar.')});
+    document.addEventListener('pointerdown',e=>{const control=e.target.closest('input,select,textarea');if(control&&!control.disabled)setTimeout(()=>control.focus({preventScroll:true}),0)},{passive:true});
+    $('#cmpDate').value=today();setComparisonForm();renderHistory();renderOrders();renderDashboard();ensureEditable();registerWebMcp();
+  })();
+  </script>
+</body>
+</html>

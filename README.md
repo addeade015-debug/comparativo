@@ -1,2 +1,2 @@
 # comparativo
-[link](https://addeade015-debug.github.io/comparativo/Control_Adquisiciones-27)
+[link](https://addeade015-debug.github.io/comparativo/Control-Adquisiciones-27)

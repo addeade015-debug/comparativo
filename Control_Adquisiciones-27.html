@@ -183,10 +183,10 @@
       <dialog id="rpaCleanDialog" class="rpa-clean-dialog"><h2>Limpiar registros de prueba</h2><p>Seleccione qué revisiones quiere eliminar. Los comparativos guardados y las órdenes de compra se conservan.</p><label>Registros de cotización<select id="rpaCleanScope"><option value="pending">Solo revisiones pendientes</option><option value="sa">Cotizaciones de la SA activa</option><option value="all">Todas las cotizaciones de la bandeja</option></select></label><label class="rpa-clean-check"><input type="checkbox" id="rpaCleanDraft">Dejar en blanco el comparativo en edición</label><label class="rpa-clean-check"><input type="checkbox" id="rpaCleanAliases">Borrar equivalencias aprendidas durante las pruebas</label><p class="small muted">Si elimina una oferta importada, también se retirará su columna del comparativo en edición. Los acuerdos especiales se conservan.</p><p class="small muted">La eliminación no descarga archivos. Si quiere conservar una copia, use este botón antes de eliminar.</p><div class="toolbar"><button class="btn btn-secondary" id="rpaCleanBackup">Descargar copia de seguridad</button><button class="btn btn-secondary" id="rpaCleanCancel">Cancelar</button><button class="btn btn-danger" id="rpaCleanApply">Eliminar los registros seleccionados</button></div></dialog>
       <section id="especiales" class="view" aria-labelledby="specialTitle"><div class="view-head"><div><h1 id="specialTitle">Precios congelados y proveedor único</h1><p>Registre el acuerdo y su respaldo. Después úselo en una solicitud existente y confirme sus valores.</p></div></div>
         <div class="panel"><div class="panel-head"><h2>Base de datos de precios congelados</h2><span class="muted small">Carga masiva desde Excel .xlsx o CSV</span></div><div class="panel-body">
-          <div class="price-db-drop" id="priceDbDrop"><strong>Arrastre aquí la base de precios o pulse para seleccionarla</strong><br><span class="small muted">Formato Excel: Código, Descripción, Unidad, Precio, Proveedor.</span><input id="priceDbFile" type="file" accept=".xlsx,.csv,text/csv" class="hidden"></div>
-          <div class="toolbar" style="margin-top:12px"><input id="priceDbSearch" placeholder="Buscar proveedor, código o producto" style="max-width:420px"><button class="btn btn-secondary" id="priceDbClear" type="button">Vaciar base cargada</button></div>
-          <div id="priceDbStatus" class="import-status" role="status"></div><div id="priceDbList" class="price-db-table"></div>
-          <p class="small muted">La base funciona como catálogo de referencia. Al elegir “Cargar al formulario” se completan proveedor, producto, precio y condiciones; luego se adjunta el respaldo correspondiente antes de guardar el acuerdo oficial.</p>
+          <div class="price-db-drop" id="priceDbDrop"><strong>Arrastre aquí la base de precios o pulse para seleccionarla</strong><br><span class="small muted">Columnas: Código del ítem, Descripción del ítem, Unidad cotizada, Precio congelado y Proveedor de compra directa.</span><input id="priceDbFile" type="file" accept=".xlsx,.csv,text/csv" class="hidden"></div>
+          <label style="margin-top:12px">Pegar filas copiadas desde Excel<textarea id="priceDbPaste" rows="5" placeholder="Código del ítem\tDescripción del ítem\tUnidad cotizada\tPrecio congelado\tProveedor de compra directa"></textarea></label>
+          <div class="toolbar" style="margin-top:8px"><button class="btn btn-primary btn-sm" id="priceDbPasteImport" type="button">Registrar filas pegadas</button></div>
+          <div id="priceDbStatus" class="import-status" role="status"></div>
         </div></div>
         <div class="panel"><div class="panel-head"><h2>Nuevo acuerdo / justificación</h2></div><div class="panel-body"><div class="grid cols-4">
           <label>Modalidad<select id="spType"><option>Precio congelado</option><option>Proveedor único</option></select></label><label>Proveedor<input id="spSupplier"></label><label>Código del producto<input id="spCode"></label><label>Producto / servicio<input id="spDescription"></label>
@@ -194,7 +194,7 @@
           <label>Hasta<input id="spTo" type="date"></label><label>Plazo de entrega<input id="spDelivery"></label><label style="grid-column:span 2">Forma de pago<input id="spPayment" placeholder="Ej. crédito 30 días / transferencia"></label>
           <label>Autorizado por<input id="spApprover"></label><label>Respaldo (PDF / imagen)<input type="file" id="spEvidence" accept=".pdf,.png,.jpg,.jpeg"></label><label style="grid-column:span 2">Motivo / referencia de contrato<textarea id="spReason"></textarea></label>
         </div><p class="small muted">Un acuerdo registra un producto. Puede crear varios productos del mismo contrato. Los vencidos o sin respaldo disponible no se pueden aplicar.</p><button class="btn btn-primary" id="spSave">Guardar acuerdo respaldado</button><div id="spStatus" class="import-status" role="status"></div></div></div>
-        <div class="panel"><div class="panel-head"><h2>Acuerdos registrados</h2></div><div class="panel-body"><div id="spList" class="history-list"></div></div></div>
+        <div class="panel"><div class="panel-head"><h2>Acuerdos registrados</h2></div><div class="panel-body"><h3>Referencias importadas de Excel</h3><div class="toolbar" style="margin-bottom:14px"><input id="priceDbSearch" placeholder="Buscar proveedor, código o producto" style="max-width:420px"><button class="btn btn-secondary" id="priceDbClear" type="button">Vaciar base cargada</button></div><div id="priceDbList" class="price-db-table"></div><p class="small muted">Las referencias del catálogo no sustituyen un acuerdo formal respaldado.</p><h3>Acuerdos con respaldo</h3><div id="spList" class="history-list"></div></div></div>
       </section>
 
       <section id="comparativo" class="view active" aria-labelledby="comparativoTitle">
@@ -238,7 +238,7 @@
         </div>
 
         <div class="panel">
-          <div class="panel-head"><h2>Ofertas de proveedores</h2><div class="toolbar"><span class="muted small">Elija CLP o USD para cada proveedor; en USD ingrese CLP por 1 USD</span><button class="btn btn-secondary btn-sm" id="addSupplier">Agregar proveedor</button></div></div>
+          <div class="panel-head"><h2>Ofertas de proveedores</h2><div class="toolbar"><span class="muted small">Elija CLP o USD para cada proveedor; en USD ingrese CLP por 1 USD</span><button class="btn btn-secondary btn-sm" id="loadFrozenPrices">Traer precios congelados</button><button class="btn btn-secondary btn-sm" id="addSupplier">Agregar proveedor</button></div></div>
           <div class="panel-body"><p class="muted small">Precios: Enter o Tab baja al siguiente ítem; al terminar, pasa al siguiente proveedor. Shift + Enter o Shift + Tab vuelve al anterior.</p><div id="supplierStrip" class="supplier-strip"></div></div>
         </div>
 
@@ -250,8 +250,8 @@
               <label>Motivo de adjudicación<textarea id="decisionReason" placeholder="Obligatorio cuando no se selecciona la alternativa de menor precio"></textarea></label>
               <div id="recommendation" class="recommendation">Complete las ofertas para obtener una recomendación.</div>
             </div>
-            <div id="customAwardPanel" class="hidden" style="margin-top:16px"><div class="rpa-alert"><strong>Adjudicación personalizada / dividida</strong><br><span class="small">Seleccione el proveedor de cada ítem. Abajo aparecerá un PDF individual por proveedor; “Descargar PDF” reúne esos comparativos en un archivo, cada uno en páginas separadas. Al guardar se crearán comparativos .1, .2, etc., y una OC separada por proveedor al enviarlos a seguimiento.</span></div><div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>N°</th><th>Ítem</th><th>Proveedor adjudicado</th><th>Precio adjudicado CLP</th></tr></thead><tbody id="customAwardBody"></tbody></table></div><div id="customAwardPdfActions" class="toolbar" style="margin-top:12px"></div></div>
-            <div class="toolbar" style="margin-top:16px"><button class="btn btn-primary" id="saveAndTrack">Guardar y enviar a seguimiento</button><button class="btn btn-secondary" id="exportComparisonExcel">Descargar Excel</button><button class="btn btn-secondary" id="exportComparisonPdf">Descargar PDF</button></div>
+            <div id="customAwardPanel" class="hidden" style="margin-top:16px"><div class="rpa-alert"><strong>Adjudicación personalizada / dividida</strong><br><span class="small">Seleccione el proveedor de cada ítem. Abajo aparecerá un PDF individual por proveedor; “Imprimir PDF” reúne esos comparativos en un archivo, cada uno en páginas separadas. Al guardar se crearán comparativos .1, .2, etc., y una OC separada por proveedor al enviarlos a seguimiento.</span></div><div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>N°</th><th>Ítem</th><th>Proveedor adjudicado</th><th>Precio adjudicado CLP</th></tr></thead><tbody id="customAwardBody"></tbody></table></div><div id="customAwardPdfActions" class="toolbar" style="margin-top:12px"></div></div>
+            <div class="toolbar" style="margin-top:16px"><button class="btn btn-primary" id="saveAndTrack">Guardar y enviar a seguimiento</button><button class="btn btn-secondary" id="exportComparisonExcel">Descargar Excel</button><button class="btn btn-secondary" id="exportComparisonPdf">Imprimir PDF</button></div>
             <div id="storageWarning" class="rpa-alert hidden" style="margin-top:14px"></div>
           </div>
         </div>
@@ -319,6 +319,21 @@
         <label style="grid-column:1/-1">Observaciones<textarea id="orderNotes"></textarea></label>
       </div>
       <div class="modal-actions"><button class="btn btn-secondary" id="cancelOrder">Cancelar</button><button class="btn btn-primary" id="saveOrder">Guardar orden</button></div>
+    </div>
+  </div>
+  <div id="priceDbEditModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="priceDbEditTitle">
+    <div class="modal">
+      <div class="modal-head"><h2 id="priceDbEditTitle">Editar referencia importada</h2><button class="close-btn" id="closePriceDbEdit" aria-label="Cerrar">×</button></div>
+      <div class="modal-body grid cols-2">
+        <input type="hidden" id="priceDbEditId">
+        <label>Proveedor de compra directa<input id="priceDbEditSupplier"></label>
+        <label>Código del ítem<input id="priceDbEditCode"></label>
+        <label style="grid-column:1/-1">Descripción del ítem<input id="priceDbEditDescription"></label>
+        <label>Unidad cotizada<input id="priceDbEditUnit"></label>
+        <label>Precio congelado<input id="priceDbEditPrice" inputmode="decimal"></label>
+      </div>
+      <div id="priceDbEditStatus" class="import-status" role="status"></div>
+      <div class="modal-actions"><button class="btn btn-secondary" id="cancelPriceDbEdit">Cancelar</button><button class="btn btn-primary" id="savePriceDbEdit">Guardar cambios</button></div>
     </div>
   </div>
   <div id="printArea"></div><div id="toast" class="toast" role="status" aria-live="polite"></div><div id="pdfReady" class="hidden" role="status" aria-live="polite"></div>
@@ -530,13 +545,15 @@ if(typeof module!=='undefined')module.exports=RPA;
     $('#addItem').addEventListener('click',()=>{comparison.items.push({id:uid(),code:'',description:'',qty:1,unit:'unidad'});renderItems();renderSuppliers()});
     function supplierCurrency(s,c=comparison){return s.currency||c.currency||'CLP'}
     function supplierRate(s,c=comparison){const currency=supplierCurrency(s,c);return currency==='CLP'?1:currency==='USD'&&Number(s.fxRate)>0?Number(s.fxRate):NaN}
+    function supplierUnitMatches(s,item){const quoted=s.rpaMetadata?.itemPriceUnits?.[item.id];return !quoted||!item.unit||RPA.unitKey(quoted)===RPA.unitKey(item.unit)}
     function supplierTotalFor(c,s){return c.items.reduce((a,item)=>a+(Number(item.qty)||0)*(Number(s.prices[item.id])||0),0)}
     function supplierTotal(s){return supplierTotalFor(comparison,s)}
     function supplierTotalCLP(s,c=comparison){return supplierTotalFor(c,s)*supplierRate(s,c)}
-    function offerComplete(c,s){return c.items.length>0&&c.items.every(i=>Object.hasOwn(s.prices,i.id)&&s.prices[i.id]!==''&&s.prices[i.id]!==null&&Number.isFinite(Number(s.prices[i.id]))&&Number(s.prices[i.id])>=0)}
-    function specialSingle(){const active=comparison.suppliers.filter(s=>s.name.trim());return active.length===1&&['Proveedor único','Precio congelado'].includes(active[0].offerType)&&!!active[0].rpaMetadata?.contractId&&!!active[0].rpaQuoteId;}
+    function offerComplete(c,s){return c.items.length>0&&c.items.every(i=>supplierUnitMatches(s,i)&&Object.hasOwn(s.prices,i.id)&&s.prices[i.id]!==''&&s.prices[i.id]!==null&&Number.isFinite(Number(s.prices[i.id]))&&Number(s.prices[i.id])>=0)}
+    function specialSingle(){const active=comparison.suppliers.filter(s=>s.name.trim()),supplier=active[0],metadata=supplier?.rpaMetadata,linkedAgreement=metadata?.source==='agreement-link'&&metadata.contractIds?.length>0,linkedPriceBase=metadata?.source==='price-base'&&metadata.priceBaseIds?.length>0;return active.length===1&&['Proveedor único','Precio congelado','Acuerdo respaldado'].includes(supplier.offerType)&&((!!metadata?.contractId&&!!supplier.rpaQuoteId)||linkedAgreement||linkedPriceBase);}
     function validSupplierTotals(){return comparison.suppliers.filter(s=>s.name.trim()&&offerComplete(comparison,s)&&supplierTotal(s)>0&&Number.isFinite(supplierTotalCLP(s))).map(s=>({id:s.id,name:s.name,total:supplierTotalCLP(s)}))}
     function renderSuppliers(){const totals=validSupplierTotals();const minTotal=totals.length?Math.min(...totals.map(x=>x.total)):0;const strip=$('#supplierStrip');strip.innerHTML=comparison.suppliers.map((s,idx)=>{const currency=supplierCurrency(s),rate=supplierRate(s),total=supplierTotal(s),totalCLP=supplierTotalCLP(s);return `<article class="supplier-card ${Number.isFinite(totalCLP)&&totalCLP>0&&totalCLP===minTotal?'winner':''}"><div class="supplier-title"><strong>Proveedor ${idx+1}${s.offerType?` · ${esc(s.offerType)}`:''}</strong>${comparison.suppliers.length>2?`<button type="button" class="btn btn-danger btn-sm" data-remove-supplier="${s.id}">Quitar</button>`:''}</div><div class="supplier-fields"><label>Nombre<input data-supplier="${s.id}" data-sfield="name" value="${esc(s.name)}" placeholder="Razón social"></label><label>Moneda de cotización<select data-quote-currency="${s.id}"><option value="CLP" ${currency==='CLP'?'selected':''}>CLP</option><option value="USD" ${currency==='USD'?'selected':''}>USD</option>${!['CLP','USD'].includes(currency)?`<option value="${esc(currency)}" selected>${esc(currency)} (anterior)</option>`:''}</select></label>${currency==='USD'?`<label>Tipo de cambio (CLP por 1 USD)<input data-fx-rate="${s.id}" type="number" inputmode="decimal" min="0.0001" step="any" value="${esc(s.fxRate??'')}" placeholder="Ej. 950"></label>`:''}<label>Plazo entrega<input data-supplier="${s.id}" data-sfield="delivery" value="${esc(s.delivery)}" placeholder="Ej. 15 días"></label><label style="grid-column:1/-1">Forma de pago<input data-supplier="${s.id}" data-sfield="payment" value="${esc(s.payment)}" placeholder="Ej. OC30"></label></div><div class="supplier-prices"><table><thead><tr><th>Ítem</th><th>Precio unitario (${esc(currency)})</th><th>Total cotizado</th><th>Total CLP</th></tr></thead><tbody>${comparison.items.map((item,i)=>{const row=(Number(item.qty)||0)*(Number(s.prices[item.id])||0);return `<tr><td>${i+1}. ${esc(item.description||'Sin descripción')}</td><td><input data-price-supplier="${s.id}" data-price-item="${item.id}" type="number" inputmode="decimal" min="0" step="any" value="${s.prices[item.id]??''}" placeholder="0"></td><td class="num">${Object.hasOwn(s.prices,item.id)?money(row,currency):'No cotizado'}</td><td class="num">${Object.hasOwn(s.prices,item.id)?(Number.isFinite(rate)?money(row*rate,'CLP'):'Ingrese tipo de cambio'):'No cotizado'}</td></tr>`}).join('')}</tbody></table></div><div class="supplier-total"><span>${offerComplete(comparison,s)?'Total neto':'Oferta incompleta'}: ${money(total,currency)}</span><span>${offerComplete(comparison,s)?(Number.isFinite(totalCLP)?money(totalCLP,'CLP'):'Ingrese tipo de cambio'):'No comparable por total'}</span></div></article>`}).join('');
+      $$('[data-price-supplier]',strip).forEach(input=>{const supplier=comparison.suppliers.find(entry=>entry.id===input.dataset.priceSupplier),item=comparison.items.find(entry=>entry.id===input.dataset.priceItem),quotedUnit=supplier?.rpaMetadata?.itemPriceUnits?.[item?.id];if(!quotedUnit)return;const note=document.createElement('small');note.className='muted';note.textContent=`Cotizado en ${quotedUnit}; solicitud: ${item.unit||'—'}${supplierUnitMatches(supplier,item)?'':' · Unidad distinta: revise antes de comparar'}`;input.parentElement.append(note);if(!supplierUnitMatches(supplier,item)){const row=input.closest('tr'),summary=input.closest('.supplier-card').querySelector('.supplier-total');row.children[2].textContent='Unidad distinta';row.children[3].textContent='No comparable';summary.firstElementChild.textContent='Oferta incompleta: revise unidades';summary.lastElementChild.textContent='No comparable por unidad'}});
       $$('[data-supplier]',strip).forEach(inp=>inp.addEventListener('input',e=>{const s=comparison.suppliers.find(x=>x.id===e.target.dataset.supplier);s[e.target.dataset.sfield]=e.target.value;refreshDecision()}));
       $$('[data-quote-currency]',strip).forEach(el=>el.addEventListener('change',e=>{const s=comparison.suppliers.find(x=>x.id===e.target.dataset.quoteCurrency);s.currency=e.target.value;renderSuppliers()}));
       $$('[data-fx-rate]',strip).forEach(el=>el.addEventListener('change',e=>{const s=comparison.suppliers.find(x=>x.id===e.target.dataset.fxRate);s.fxRate=e.target.value;renderSuppliers()}));
@@ -544,10 +561,63 @@ if(typeof module!=='undefined')module.exports=RPA;
       $$('[data-remove-supplier]',strip).forEach(btn=>btn.addEventListener('click',()=>{comparison.suppliers=comparison.suppliers.filter(x=>x.id!==btn.dataset.removeSupplier);if(comparison.selectedSupplierId===btn.dataset.removeSupplier)comparison.selectedSupplierId='';renderSuppliers()}));refreshDecision();ensureEditable(strip);
     }
     $('#addSupplier').addEventListener('click',()=>{if(comparison.suppliers.length>=5)return toast('El máximo es de cinco proveedores.',true);comparison.suppliers.push(newSupplier());renderSuppliers()});
+    async function loadFrozenPrices(){
+      syncComparisonFromForm();
+      const items=comparison.items.filter(item=>item.code.trim()||item.description.trim());
+      if(!items.length)return toast('Ingrese al menos un código o descripción para buscar acuerdos.',true);
+      const requestDate=comparison.date||today(),groups=new Map(),sources=[...(state.rpaPriceBase||[]).map(record=>({...record,recordSource:'price-base',type:'Precio congelado'})),...state.rpaContracts.map(record=>({...record,recordSource:'agreement'}))];
+      for(const agreement of sources){
+        if(!agreement.supplier||!['CLP','USD'].includes(agreement.currency)||!Number.isFinite(Number(agreement.price))||Number(agreement.price)<0)continue;
+        if(agreement.recordSource==='agreement'){
+          if(!['Precio congelado','Proveedor único'].includes(agreement.type)||agreement.from>requestDate||agreement.to<requestDate||agreement.to<rpaDate())continue;
+          if(!await docGet(agreement.id).catch(()=>null))continue;
+        }else if(agreement.recordSource!=='price-base')continue;
+        for(const item of items){
+          const score=RPA.match(item,{code:agreement.code,description:agreement.description}).score;
+          if(score<65)continue;
+          const key=`${normHeader(agreement.supplier)}|${agreement.currency}`,group=groups.get(key)||{supplier:agreement.supplier,currency:agreement.currency,matches:new Map(),types:new Set()};
+          group.types.add(agreement.type);
+          const previous=group.matches.get(item.id),priority=agreement.recordSource==='agreement'?2:1;
+          if(!previous||score>previous.score||score===previous.score&&priority>previous.priority)group.matches.set(item.id,{agreement,score,source:agreement.recordSource,priority});
+          groups.set(key,group);
+        }
+      }
+      if(!groups.size)return toast('No hay precios coincidentes en el catálogo ni acuerdos vigentes.',true);
+      let loaded=0,skipped=0;
+      for(const group of groups.values()){
+        let supplier=comparison.suppliers.find(entry=>normHeader(entry.name)===normHeader(group.supplier)&&supplierCurrency(entry)===group.currency);
+        if(!supplier){
+          supplier=comparison.suppliers.find(entry=>!entry.name.trim()&&!Object.values(entry.prices||{}).some(value=>value!==''&&value!==null&&value!==undefined));
+          if(!supplier&&comparison.suppliers.length<5){supplier=newSupplier();comparison.suppliers.push(supplier)}
+          if(!supplier){skipped++;continue}
+          supplier.name=group.supplier;supplier.currency=group.currency;
+        }
+        const metadata=supplier.rpaMetadata||(supplier.rpaMetadata={}),contractIds=new Set(metadata.contractIds||[]),itemContractIds=metadata.itemContractIds||(metadata.itemContractIds={}),priceBaseIds=new Set(metadata.priceBaseIds||[]),itemPriceBaseIds=metadata.itemPriceBaseIds||(metadata.itemPriceBaseIds={}),itemPriceUnits=metadata.itemPriceUnits||(metadata.itemPriceUnits={});
+        for(const [itemId,match] of group.matches){
+          const current=supplier.prices[itemId],hasPrice=current!==''&&current!==null&&current!==undefined&&Number.isFinite(Number(current));
+          if(hasPrice)continue;
+          supplier.prices[itemId]=Number(match.agreement.price);itemPriceUnits[itemId]=match.agreement.unit||'';
+          if(match.source==='price-base'){priceBaseIds.add(match.agreement.id);itemPriceBaseIds[itemId]=match.agreement.id}else{contractIds.add(match.agreement.id);itemContractIds[itemId]=match.agreement.id}
+          loaded++;
+        }
+        if(contractIds.size||priceBaseIds.size){
+          if(contractIds.size){metadata.contractIds=[...contractIds];metadata.contractId=contractIds.size===1?[...contractIds][0]:'';metadata.itemContractIds=itemContractIds}
+          if(priceBaseIds.size){metadata.priceBaseIds=[...priceBaseIds];metadata.itemPriceBaseIds=itemPriceBaseIds}
+          metadata.source=contractIds.size?(priceBaseIds.size?'mixed-agreement-sources':'agreement-link'):'price-base';metadata.itemPriceUnits=itemPriceUnits;
+          supplier.offerType=group.types.size===1?[...group.types][0]:'Acuerdo respaldado';
+          const firstAgreement=group.matches.values().next().value?.agreement;
+          if(!supplier.delivery)supplier.delivery=firstAgreement?.delivery||'';
+          if(!supplier.payment)supplier.payment=firstAgreement?.payment||'';
+        }
+      }
+      renderSuppliers();renderCustomAward();
+      toast(loaded?`${loaded} precio(s) cargado(s) desde el catálogo o acuerdos vigentes.${skipped?` ${skipped} proveedor(es) omitido(s): se alcanzó el máximo de cinco.`:''}`:skipped?'No hay espacios de proveedor disponibles; el máximo es cinco.':'Los precios existentes se conservaron; no había celdas vacías para completar.',!loaded);
+    }
+    $('#loadFrozenPrices').addEventListener('click',()=>loadFrozenPrices().catch(handleError));
     function isCustomAward(c=comparison){return c.selectedSupplierId==='__CUSTOM__'}
-    function customAwardRows(c=comparison){return c.items.map(item=>{const supplierId=(c.customAwards||{})[item.id]||'';const supplier=c.suppliers.find(s=>s.id===supplierId);const rate=supplier?supplierRate(supplier,c):NaN;const unit=supplier&&Object.hasOwn(supplier.prices,item.id)?Number(supplier.prices[item.id]):NaN;const total=supplier&&Number.isFinite(rate)&&Number.isFinite(unit)?(Number(item.qty)||0)*unit*rate:NaN;return {item,supplierId,supplier,total}})}
+    function customAwardRows(c=comparison){return c.items.map(item=>{const supplierId=(c.customAwards||{})[item.id]||'';const supplier=c.suppliers.find(s=>s.id===supplierId);const rate=supplier?supplierRate(supplier,c):NaN;const unit=supplier&&Object.hasOwn(supplier.prices,item.id)?Number(supplier.prices[item.id]):NaN;const total=supplier&&supplierUnitMatches(supplier,item)&&Number.isFinite(rate)&&Number.isFinite(unit)?(Number(item.qty)||0)*unit*rate:NaN;return {item,supplierId,supplier,total}})}
     function customAwardSummary(c=comparison){const rows=customAwardRows(c).filter(r=>r.supplier&&Number.isFinite(r.total));const groups=new Map();for(const r of rows){const g=groups.get(r.supplierId)||{supplier:r.supplier,total:0,items:[]};g.total+=r.total;g.items.push(r.item);groups.set(r.supplierId,g)}return [...groups.values()]}
-    function renderCustomAward(){const panel=$('#customAwardPanel'),body=$('#customAwardBody');if(!panel||!body)return;const custom=isCustomAward();panel.classList.toggle('hidden',!custom);if(!custom)return;comparison.customAwards=comparison.customAwards||{};body.innerHTML=comparison.items.map((item,i)=>{const opts=comparison.suppliers.filter(s=>s.name.trim()&&Object.hasOwn(s.prices,item.id)&&Number(s.prices[item.id])>=0&&Number.isFinite(supplierRate(s))).map(s=>`<option value="${s.id}" ${(comparison.customAwards[item.id]||'')===s.id?'selected':''}>${esc(s.name)} — ${money((Number(item.qty)||0)*(Number(s.prices[item.id])||0)*supplierRate(s),'CLP')}</option>`).join('');const sid=comparison.customAwards[item.id]||'',sp=comparison.suppliers.find(s=>s.id===sid),total=sp?(Number(item.qty)||0)*(Number(sp.prices[item.id])||0)*supplierRate(sp):NaN;return `<tr><td class="center">${i+1}</td><td><strong>${esc(item.description||item.code||'Ítem')}</strong><br><small>${num(item.qty)} ${esc(item.unit||'')}</small></td><td><select data-custom-award="${item.id}"><option value="" ${sid?'':'selected'}>Seleccione proveedor</option>${opts}</select></td><td class="num">${Number.isFinite(total)?money(total,'CLP'):'—'}</td></tr>`}).join('');$$('[data-custom-award]',body).forEach(el=>el.addEventListener('change',e=>{comparison.customAwards[e.target.dataset.customAward]=e.target.value;refreshDecision()}));ensureEditable(body);
+    function renderCustomAward(){const panel=$('#customAwardPanel'),body=$('#customAwardBody');if(!panel||!body)return;const custom=isCustomAward();panel.classList.toggle('hidden',!custom);if(!custom)return;comparison.customAwards=comparison.customAwards||{};body.innerHTML=comparison.items.map((item,i)=>{const opts=comparison.suppliers.filter(s=>s.name.trim()&&supplierUnitMatches(s,item)&&Object.hasOwn(s.prices,item.id)&&Number(s.prices[item.id])>=0&&Number.isFinite(supplierRate(s))).map(s=>`<option value="${s.id}" ${(comparison.customAwards[item.id]||'')===s.id?'selected':''}>${esc(s.name)} — ${money((Number(item.qty)||0)*(Number(s.prices[item.id])||0)*supplierRate(s),'CLP')}</option>`).join('');const sid=comparison.customAwards[item.id]||'',sp=comparison.suppliers.find(s=>s.id===sid),total=sp&&supplierUnitMatches(sp,item)?(Number(item.qty)||0)*(Number(sp.prices[item.id])||0)*supplierRate(sp):NaN;return `<tr><td class="center">${i+1}</td><td><strong>${esc(item.description||item.code||'Ítem')}</strong><br><small>${num(item.qty)} ${esc(item.unit||'')}</small></td><td><select data-custom-award="${item.id}"><option value="" ${sid?'':'selected'}>Seleccione proveedor</option>${opts}</select></td><td class="num">${Number.isFinite(total)?money(total,'CLP'):'—'}</td></tr>`}).join('');$$('[data-custom-award]',body).forEach(el=>el.addEventListener('change',e=>{comparison.customAwards[e.target.dataset.customAward]=e.target.value;refreshDecision()}));ensureEditable(body);
       const actions=$('#customAwardPdfActions'),groups=customAwardSummary();
       actions.innerHTML=groups.map((g,i)=>`<button type="button" class="btn btn-secondary btn-sm" data-pdf-award="${esc(g.supplier.id)}">Descargar PDF · ${esc(g.supplier.name)} (${g.items.length} ítem${g.items.length===1?'':'s'})</button>`).join('');
       $$('[data-pdf-award]',actions).forEach(button=>button.addEventListener('click',()=>{
@@ -833,10 +903,26 @@ if(typeof module!=='undefined')module.exports=RPA;
     const offers=[[{v:'Proveedor'},{v:'Moneda'},{v:'Tipo de cambio'},{v:'Total cotizado'},{v:'Total CLP'},{v:'Adjudicado'},{v:'Entrega'},{v:'Pago'},{v:'Tipo de oferta'},{v:'Revisado por'}],...comparison.suppliers.map(s=>[{v:s.name},{v:supplierCurrency(s)},{v:Number.isFinite(supplierRate(s))?supplierRate(s):0,t:'Number'},{v:supplierTotal(s),t:'Number'},{v:Number.isFinite(supplierTotalCLP(s))?supplierTotalCLP(s):0,t:'Number'},{v:s.id===comparison.selectedSupplierId?'Sí':'No'},{v:s.delivery},{v:s.payment},{v:s.offerType||'Cotización'},{v:s.rpaMetadata?.reviewer||''}])];
     downloadBlob(excelXml([{name:'Resumen',rows},{name:'Ofertas',rows:offers},{name:'Detalle ofertas',rows:detail}]),'application/vnd.ms-excel;charset=utf-8',`Comparativo_${comparison.code}.xls`)}
     $('#exportComparisonExcel').addEventListener('click',exportComparisonExcel);
-    async function downloadSplitComparatives(c){
+    function printGeneratedPdf(bytes,name,printWindow){
+      if(!bytes){printWindow.close();return}
+      const pdfUrl=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+      printWindow.document.title=name;
+      printWindow.document.body.style.margin='0';
+      const frame=printWindow.document.createElement('iframe');
+      frame.title=name;frame.src=pdfUrl;frame.style.cssText='width:100%;height:100vh;border:0';
+      frame.addEventListener('load',()=>{printWindow.focus();printWindow.print()},{once:true});
+      printWindow.addEventListener('beforeunload',()=>URL.revokeObjectURL(pdfUrl),{once:true});
+      printWindow.document.body.append(frame);
+    }
+    async function downloadSplitComparatives(c,printWindow=null){
       const groups=customAwardSummary(c);
       if(!groups.length)return toast('Seleccione al menos un proveedor y un ítem con precio válido.',true);
-      if(groups.length===1)return downloadComparisonPdf(previewSplitPart(groups[0],1),'part');
+      if(groups.length===1){
+        const part=previewSplitPart(groups[0],1);
+        if(!printWindow)return downloadComparisonPdf(part,'part');
+        const bytes=await downloadComparisonPdf(part,'part',true);
+        return printGeneratedPdf(bytes,`Comparativo_${String(part.code||'sin_codigo').replace(/[^\\w.-]/g,'_')}.pdf`,printWindow);
+      }
       const pdf=await PDFLib.PDFDocument.create();
       for(let i=0;i<groups.length;i++){
         const bytes=await downloadComparisonPdf(previewSplitPart(groups[i],i+1),'part',true);
@@ -844,18 +930,26 @@ if(typeof module!=='undefined')module.exports=RPA;
         const partial=await PDFLib.PDFDocument.load(bytes);
         for(const page of await pdf.copyPages(partial,partial.getPageIndices()))pdf.addPage(page);
       }
-      deliverPdf(await pdf.save(),`Comparativos_${String(c.code||'solicitud').replace(/[^\w.-]/g,'_')}_por_proveedor.pdf`);
+      const name=`Comparativos_${String(c.code||'solicitud').replace(/[^\\w.-]/g,'_')}_por_proveedor.pdf`;
+      const bytes=await pdf.save();
+      if(printWindow)return printGeneratedPdf(bytes,name,printWindow);
+      deliverPdf(bytes,name);
     }
-    function prepareComparisonPrint(){
+    async function prepareComparisonPrint(){
       syncComparisonFromForm();
       if(isCustomAward()){
-        if(!comparison.code)return toast('Ingrese el código de la solicitud antes de descargar el PDF.',true);
+        if(!comparison.code)return toast('Ingrese el código de la solicitud antes de imprimir el comparativo.',true);
         const rows=customAwardRows();
         if(rows.some(r=>!r.supplierId||!r.supplier||!Number.isFinite(r.total)))return toast('Seleccione un proveedor con precio válido para cada ítem. Para uno solo use su botón PDF por proveedor.',true);
-        return downloadSplitComparatives(comparison);
+        const printWindow=window.open('about:blank','_blank');
+        if(!printWindow)return toast('Permita las ventanas emergentes para imprimir el comparativo.',true);
+        return downloadSplitComparatives(comparison,printWindow);
       }
       const error=validateComparison();if(error)return toast(error,true);
-      return downloadComparisonPdf(comparison,'standard');
+      const printWindow=window.open('about:blank','_blank');
+      if(!printWindow)return toast('Permita las ventanas emergentes para imprimir el comparativo.',true);
+      const bytes=await downloadComparisonPdf(comparison,'standard',true);
+      return printGeneratedPdf(bytes,`Comparativo_${String(comparison.code||'sin_codigo').replace(/[^\\w.-]/g,'_')}.pdf`,printWindow);
     }
     $('#exportComparisonPdf').addEventListener('click',prepareComparisonPrint);
 
@@ -1256,17 +1350,64 @@ if(typeof module!=='undefined')module.exports=RPA;
     function normHeader(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
     function priceDbValue(row,names){for(const n of names){const key=Object.keys(row).find(k=>normHeader(k)===normHeader(n));if(key&&String(row[key]??'').trim()!=='')return String(row[key]).trim()}return ''}
     function parseDbNumber(v){let x=String(v??'').trim().replace(/\$/g,'').replace(/\s/g,'');if(!x)return NaN;if(x.includes(',')&&x.includes('.'))x=x.lastIndexOf(',')>x.lastIndexOf('.')?x.replace(/\./g,'').replace(',','.'):x.replace(/,/g,'');else if(/^\d{1,3}(\.\d{3})+$/.test(x))x=x.replace(/\./g,'');else x=x.replace(',','.');return Number(x)}
-    function mapPriceDbRows(rows){return rows.map((r,i)=>{const price=parseDbNumber(priceDbValue(r,['Precio','Precio unitario','Precio unitario neto','Valor unitario','Valor']));const currency=(priceDbValue(r,['Moneda','Currency'])||'CLP').toUpperCase().includes('USD')?'USD':'CLP';return {id:uid(),supplier:priceDbValue(r,['Proveedor']),code:priceDbValue(r,['Código','Codigo']),description:priceDbValue(r,['Descripción','Descripcion']),price,currency:'CLP',unit:priceDbValue(r,['Unidad'])||'unidad',from:'',to:'',delivery:'',payment:'',sourceRow:i+2}}).filter(x=>x.supplier&&x.description&&Number.isFinite(x.price)&&x.price>=0)}
-    function csvRows(text){const lines=String(text).replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim());if(!lines.length)return[];const delim=(lines[0].match(/;/g)||[]).length>(lines[0].match(/,/g)||[]).length?';':',';const parse=line=>{const out=[];let cur='',q=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(c===delim&&!q){out.push(cur);cur=''}else cur+=c}out.push(cur);return out};const h=parse(lines[0]);return lines.slice(1).map(l=>{const a=parse(l),o={};h.forEach((k,i)=>o[k]=a[i]??'');return o})}
+    function mapPriceDbRows(rows){return rows.map((r,i)=>{const price=parseDbNumber(priceDbValue(r,['Precio congelado','Precio congelado unitario','Precio','Precio unitario','Precio unitario neto','Valor unitario','Valor']));const currency=(priceDbValue(r,['Moneda','Currency'])||'CLP').toUpperCase().includes('USD')?'USD':'CLP';return {id:uid(),supplier:priceDbValue(r,['Proveedor de compra directa','Proveedor compra directa','Proveedor asignado','Proveedor']),code:priceDbValue(r,['Código del ítem','Codigo del item','Código del item','Código ítem','Código item','Código producto','Código','Codigo']),description:priceDbValue(r,['Descripción del ítem','Descripcion del item','Descripción del item','Descripción ítem','Descripción','Descripcion']),price,currency,unit:priceDbValue(r,['Unidad cotizada','Unidad de cotización','Unidad'])||'unidad',from:'',to:'',delivery:'',payment:'',sourceRow:i+2}}).filter(x=>x.supplier&&x.description&&Number.isFinite(x.price)&&x.price>=0)}
+    function csvRows(text,hasHeader=true){const lines=String(text).replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim());if(!lines.length)return[];const first=lines[0],tabs=(first.match(/\t/g)||[]).length,semicolons=(first.match(/;/g)||[]).length,commas=(first.match(/,/g)||[]).length,delim=tabs>Math.max(semicolons,commas)?'\t':semicolons>commas?';':',';const parse=line=>{const out=[];let cur='',q=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(c===delim&&!q){out.push(cur);cur=''}else cur+=c}out.push(cur);return out};const h=parse(lines[0]);return lines.slice(hasHeader?1:0).map(l=>{const a=parse(l),o={};if(hasHeader)h.forEach((k,i)=>o[k]=a[i]??'');else a.forEach((value,i)=>o[i]=value);return o})}
     async function genericXlsxRows(file){const nodes=(doc,name)=>[...doc.getElementsByTagName(name)],zip=await openXlsx(file),workbook=parseXml(await zip.text('xl/workbook.xml'),'el libro'),sheet=nodes(workbook,'sheet')[0];if(!sheet)throw new Error('El Excel no contiene hojas.');const rels=parseXml(await zip.text('xl/_rels/workbook.xml.rels'),'las relaciones'),rel=nodes(rels,'Relationship').find(r=>r.getAttribute('Id')===relationshipId(sheet));let target=rel?.getAttribute('Target')||'';target=target.startsWith('/')?target.slice(1):'xl/'+target.replace(/^\.\//,'');const shared=[];if(zip.entries.has('xl/sharedStrings.xml')){const d=parseXml(await zip.text('xl/sharedStrings.xml'),'textos');shared.push(...nodes(d,'si').map(si=>nodes(si,'t').map(t=>t.textContent||'').join('')))}const d=parseXml(await zip.text(target),'la hoja'),matrix=[];nodes(d,'row').forEach(row=>{const arr=[];nodes(row,'c').forEach(c=>{const ref=c.getAttribute('r')||'',col=(ref.match(/[A-Z]+/)||['A'])[0];let idx=0;for(const ch of col)idx=idx*26+ch.charCodeAt(0)-64;idx--;const type=c.getAttribute('t');let v='';if(type==='inlineStr')v=nodes(c,'t').map(t=>t.textContent||'').join('');else{const raw=nodes(c,'v')[0]?.textContent??'';v=type==='s'?shared[Number(raw)]??'':raw}arr[idx]=v});matrix.push(arr)});const header=matrix.find(r=>r.filter(v=>String(v??'').trim()).length>=2)||[];const hi=matrix.indexOf(header);return matrix.slice(hi+1).map(a=>{const o={};header.forEach((h,i)=>o[String(h??'').trim()]=a[i]??'');return o})}
-    async function importPriceDb(file){if(!file) return;let rows;if(/\.csv$/i.test(file.name))rows=csvRows(await file.text());else if(/\.xlsx$/i.test(file.name))rows=await genericXlsxRows(file);else throw new Error('Use un archivo .xlsx o .csv.');const mapped=mapPriceDbRows(rows);if(!mapped.length)throw new Error('No se encontraron filas válidas. Revise que existan las columnas Código, Descripción, Unidad, Precio y Proveedor.');state.rpaPriceBase=mapped;rpaSave();q$('priceDbStatus').textContent=`Base cargada: ${mapped.length} precio(s) de ${new Set(mapped.map(x=>x.supplier)).size} proveedor(es).`;renderPriceDb();}
-    function renderPriceDb(){const term=normHeader(q$('priceDbSearch')?.value||''),rows=(state.rpaPriceBase||[]).filter(x=>!term||normHeader([x.supplier,x.code,x.description].join(' ')).includes(term));q$('priceDbList').innerHTML=rows.length?`<table><thead><tr><th>Proveedor</th><th>Código</th><th>Producto</th><th>Precio</th><th>Vigencia</th><th></th></tr></thead><tbody>${rows.map(x=>`<tr><td><strong>${esc(x.supplier)}</strong></td><td>${esc(x.code||'—')}</td><td>${esc(x.description)}<br><small>${esc(x.unit)}</small></td><td>${money(x.price,x.currency)}</td><td>${esc(x.from||'—')} → ${esc(x.to||'—')}</td><td><button class="btn btn-primary btn-sm" data-load-price="${x.id}">Cargar al formulario</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No hay precios cargados en la base.</div>';q$('priceDbList').querySelectorAll('[data-load-price]').forEach(b=>b.onclick=()=>{const x=state.rpaPriceBase.find(r=>r.id===b.dataset.loadPrice);if(!x)return;q$('spType').value='Precio congelado';q$('spSupplier').value=x.supplier;q$('spCode').value=x.code;q$('spDescription').value=x.description;q$('spPrice').value=x.price;q$('spCurrency').value=x.currency;q$('spUnit').value=x.unit;q$('spFrom').value=x.from;q$('spTo').value=x.to;q$('spDelivery').value=x.delivery;q$('spPayment').value=x.payment;q$('spReason').value='Precio cargado desde base de datos; validar contra respaldo vigente.';q$('spSupplier').scrollIntoView({behavior:'smooth',block:'center'});toast('Precio cargado al formulario. Adjunte el respaldo antes de guardar.');});}
-    const priceDbDrop=q$('priceDbDrop'),priceDbFile=q$('priceDbFile');priceDbDrop.onclick=()=>priceDbFile.click();priceDbFile.onchange=()=>importPriceDb(priceDbFile.files[0]).catch(handleError);['dragenter','dragover'].forEach(ev=>priceDbDrop.addEventListener(ev,e=>{e.preventDefault();priceDbDrop.classList.add('dragover')}));['dragleave','drop'].forEach(ev=>priceDbDrop.addEventListener(ev,e=>{e.preventDefault();priceDbDrop.classList.remove('dragover')}));priceDbDrop.addEventListener('drop',e=>importPriceDb(e.dataTransfer.files[0]).catch(handleError));q$('priceDbSearch').oninput=renderPriceDb;q$('priceDbClear').onclick=()=>{if(confirm('¿Vaciar la base de precios cargada? Los acuerdos ya guardados no se eliminarán.')){state.rpaPriceBase=[];rpaSave();renderPriceDb();q$('priceDbStatus').textContent='Base de precios vaciada.'}};
+    async function importPriceDb(file){if(!file) return;let rows;if(/\.csv$/i.test(file.name))rows=csvRows(await file.text());else if(/\.xlsx$/i.test(file.name))rows=await genericXlsxRows(file);else throw new Error('Use un archivo .xlsx o .csv.');const mapped=mapPriceDbRows(rows);if(!mapped.length)throw new Error('No se encontraron filas válidas. Revise que existan las columnas Código, Descripción, Unidad, Precio y Proveedor.');state.rpaPriceBase=mapped;rpaSave();q$('priceDbStatus').textContent=`Base cargada: ${mapped.length} precio(s) de ${new Set(mapped.map(x=>x.supplier)).size} proveedor(es).`;renderPriceDb();specialList();}
+    function mapPastedPriceDbRows(text){
+      const mapped=mapPriceDbRows(csvRows(text));if(mapped.length)return mapped;
+      const unitPattern=/^(?:U|UN|UND|UNIDAD(?:ES)?|EA|KG|G|GR|L|LT|M|MT|MTS|M2|M3|PAR|CJ|CAJA|PZA|ROLLO|SET|BOLSA|JGO|GL)$/i;
+      return csvRows(text,false).map((row,index)=>{
+        const values=Object.values(row).map(value=>String(value??'').trim());if(values.length<5)return null;
+        const candidates=values.map((value,column)=>({value,column,price:parseDbNumber(value)})).filter(entry=>entry.column>=2&&Number.isFinite(entry.price)&&entry.price>=0);
+        const price=candidates.find(entry=>entry.value.includes('$'))||candidates.find(entry=>entry.column===3)||candidates[0];if(!price)return null;
+        const unitColumn=values.findIndex((value,column)=>column>=2&&column!==price.column&&unitPattern.test(value));
+        const fallbackUnitColumn=price.column===2?3:price.column===3?2:-1,unit=values[unitColumn>=0?unitColumn:fallbackUnitColumn]||'unidad',supplier=values[values.length-1];
+        if(!values[0]||!values[1]||!supplier||!Number.isFinite(price.price))return null;
+        return {id:uid(),supplier,code:values[0],description:values[1],price:price.price,currency:'CLP',unit,from:'',to:'',delivery:'',payment:'',sourceRow:index+1};
+      }).filter(Boolean);
+    }
+    function registerPastedPriceDb(){
+      const text=q$('priceDbPaste').value.trim();if(!text){q$('priceDbStatus').textContent='Pegue primero las filas copiadas desde Excel.';return}
+      const mapped=mapPastedPriceDbRows(text);if(!mapped.length){q$('priceDbStatus').textContent='No se encontraron filas válidas. Revise las columnas y el orden: código, descripción, precio, unidad y proveedor.';return}
+      const keyOf=row=>row.code?.trim()?`code:${normHeader(row.code)}`:`description:${[row.supplier,row.description,row.unit].map(value=>normHeader(value)).join('|')}`,previous=state.rpaPriceBase||[],next=[...previous],indices=new Map(next.map((row,index)=>[keyOf(row),index]));let added=0,updated=0;
+      for(const row of mapped){const key=keyOf(row),index=indices.get(key);if(index===undefined){indices.set(key,next.length);next.push(row);added++}else{next[index]={...next[index],...row,id:next[index].id};updated++}}
+      state.rpaPriceBase=next;if(!rpaSave()){state.rpaPriceBase=previous;return}
+      renderPriceDb();specialList();q$('priceDbPaste').value='';q$('priceDbStatus').textContent=`Pegado registrado: ${added} nuevo(s), ${updated} actualizado(s). Total: ${next.length} precio(s).`;
+    }
+    q$('priceDbPasteImport').addEventListener('click',registerPastedPriceDb);
+    function openPriceDbEdit(rowId){
+      const row=(state.rpaPriceBase||[]).find(entry=>entry.id===rowId);if(!row)return;
+      q$('priceDbEditId').value=row.id;q$('priceDbEditSupplier').value=row.supplier;q$('priceDbEditCode').value=row.code||'';q$('priceDbEditDescription').value=row.description;q$('priceDbEditUnit').value=row.unit;q$('priceDbEditPrice').value=String(row.price??'');q$('priceDbEditStatus').textContent='';
+      q$('priceDbEditModal').classList.add('open');ensureEditable(q$('priceDbEditModal'));setTimeout(()=>q$('priceDbEditSupplier').focus(),80);
+    }
+    function closePriceDbEdit(){q$('priceDbEditModal').classList.remove('open')}
+    function savePriceDbEdit(){
+      const row=(state.rpaPriceBase||[]).find(entry=>entry.id===q$('priceDbEditId').value);if(!row)return closePriceDbEdit();
+      const values={supplier:q$('priceDbEditSupplier').value.trim(),code:q$('priceDbEditCode').value.trim(),description:q$('priceDbEditDescription').value.trim(),unit:q$('priceDbEditUnit').value.trim()},price=parseDbNumber(q$('priceDbEditPrice').value);
+      if(!values.supplier||!values.description||!values.unit||!Number.isFinite(price)||price<0){q$('priceDbEditStatus').textContent='Complete proveedor, descripción, unidad y un precio válido.';return}
+      const duplicate=values.code&&(state.rpaPriceBase||[]).find(entry=>entry.id!==row.id&&entry.code&&normHeader(entry.code)===normHeader(values.code));if(duplicate){q$('priceDbEditStatus').textContent=`El código ${values.code} ya existe. Edite esa referencia para evitar duplicados.`;return}
+      const previous={...row};Object.assign(row,values,{price});if(!rpaSave()){Object.assign(row,previous);return}
+      closePriceDbEdit();renderPriceDb();q$('priceDbStatus').textContent=`Referencia ${row.code||row.description} actualizada en la base.`;
+    }
+    $('#closePriceDbEdit').addEventListener('click',closePriceDbEdit);
+    $('#cancelPriceDbEdit').addEventListener('click',closePriceDbEdit);
+    $('#priceDbEditModal').addEventListener('click',event=>{if(event.target.id==='priceDbEditModal')closePriceDbEdit()});
+    $('#savePriceDbEdit').addEventListener('click',savePriceDbEdit);
+    function renderPriceDb(){const term=normHeader(q$('priceDbSearch')?.value||''),rows=(state.rpaPriceBase||[]).filter(row=>!term||normHeader([row.supplier,row.code,row.description].join(' ')).includes(term));q$('priceDbList').innerHTML=rows.length?`<div class="table-wrap"><table><thead><tr><th>Proveedor</th><th>Código</th><th>Descripción</th><th>Unidad</th><th>Precio</th><th>Acciones</th></tr></thead><tbody>${rows.map(row=>`<tr><td><strong>${esc(row.supplier)}</strong></td><td>${esc(row.code||'—')}</td><td>${esc(row.description)}</td><td>${esc(row.unit)}</td><td class="num">${money(row.price,row.currency)}</td><td><div class="toolbar"><button type="button" class="btn btn-secondary btn-sm" data-edit-price="${row.id}">Editar</button><button type="button" class="btn btn-primary btn-sm" data-load-price="${row.id}">Cargar al formulario</button></div></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No hay precios cargados en la base.</div>';
+      q$('priceDbList').querySelectorAll('[data-edit-price]').forEach(button=>button.onclick=()=>openPriceDbEdit(button.dataset.editPrice));
+      q$('priceDbList').querySelectorAll('[data-load-price]').forEach(button=>button.onclick=()=>loadPriceDbToForm((state.rpaPriceBase||[]).find(row=>row.id===button.dataset.loadPrice)));
+    }
+    const priceDbDrop=q$('priceDbDrop'),priceDbFile=q$('priceDbFile');priceDbDrop.onclick=()=>priceDbFile.click();priceDbFile.onchange=()=>importPriceDb(priceDbFile.files[0]).catch(handleError);['dragenter','dragover'].forEach(ev=>priceDbDrop.addEventListener(ev,e=>{e.preventDefault();priceDbDrop.classList.add('dragover')}));['dragleave','drop'].forEach(ev=>priceDbDrop.addEventListener(ev,e=>{e.preventDefault();priceDbDrop.classList.remove('dragover')}));priceDbDrop.addEventListener('drop',e=>importPriceDb(e.dataTransfer.files[0]).catch(handleError));q$('priceDbSearch').oninput=renderPriceDb;q$('priceDbClear').onclick=()=>{if(confirm('¿Vaciar la base de precios cargada? Los acuerdos ya guardados no se eliminarán.')){state.rpaPriceBase=[];rpaSave();renderPriceDb();specialList();q$('priceDbStatus').textContent='Base de precios vaciada.'}};
     renderPriceDb();
+    if((state.rpaPriceBase||[]).length)q$('priceDbStatus').textContent=`Base guardada en este navegador: ${state.rpaPriceBase.length} precio(s) de ${new Set(state.rpaPriceBase.map(row=>row.supplier)).size} proveedor(es).`;
+    specialList();
+    function loadPriceDbToForm(row){if(!row)return;q$('spType').value='Precio congelado';q$('spSupplier').value=row.supplier;q$('spCode').value=row.code;q$('spDescription').value=row.description;q$('spPrice').value=row.price;q$('spCurrency').value=row.currency;q$('spUnit').value=row.unit;q$('spFrom').value=row.from;q$('spTo').value=row.to;q$('spDelivery').value=row.delivery;q$('spPayment').value=row.payment;q$('spReason').value='Precio cargado desde base de datos; validar contra respaldo vigente.';q$('spSupplier').scrollIntoView({behavior:'smooth',block:'center'});toast('Precio cargado al formulario. Adjunte el respaldo antes de guardar.');}
     function specialList(){
-      q$('spList').innerHTML=state.rpaContracts.length?state.rpaContracts.map(a=>{const valid=a.from<=rpaDate()&&a.to>=rpaDate();return `<div class="history-item"><div><strong>${esc(a.supplier)} · ${esc(a.description)}</strong><br><small>${esc(a.type)} · ${money(a.price,a.currency)} / ${esc(a.unit)} · ${esc(a.from)} al ${esc(a.to)}</small><br><span class="status ${valid?'status-blue':'status-red'}">${valid?'Vigente':'Fuera de vigencia'}</span> <small>Respaldo: ${esc(a.evidenceName)}</small></div><div class="toolbar"><button class="btn btn-secondary btn-sm" data-view-evidence="${a.id}">Ver respaldo</button><button class="btn btn-primary btn-sm" data-use-special="${a.id}">Usar en solicitud</button></div></div>`;}).join(''):'<div class="empty">No hay acuerdos registrados.</div>';
-      q$('spList').querySelectorAll('[data-use-special]').forEach(b=>b.onclick=()=>useSpecial(state.rpaContracts.find(a=>a.id===b.dataset.useSpecial)).catch(handleError));
-      q$('spList').querySelectorAll('[data-view-evidence]').forEach(b=>b.onclick=async()=>{const blob=await docGet(b.dataset.viewEvidence).catch(()=>null);if(!blob)return rpaError('Adjunto no disponible. Restaure un respaldo RPA con documentos.');downloadBlob(blob,blob.type,state.rpaContracts.find(a=>a.id===b.dataset.viewEvidence).evidenceName);});
+      const agreements=state.rpaContracts||[];
+      q$('spList').innerHTML=agreements.length?agreements.map(agreement=>{const valid=agreement.from<=rpaDate()&&agreement.to>=rpaDate();return `<div class="history-item"><div><strong>${esc(agreement.supplier)} · ${esc(agreement.description)}</strong><br><small>${esc(agreement.type)} · ${money(agreement.price,agreement.currency)} / ${esc(agreement.unit)} · ${esc(agreement.from)} al ${esc(agreement.to)}</small><br><span class="status ${valid?'status-blue':'status-red'}">${valid?'Vigente':'Fuera de vigencia'}</span> <small>Respaldo: ${esc(agreement.evidenceName)}</small></div><div class="toolbar"><button class="btn btn-secondary btn-sm" data-view-evidence="${agreement.id}">Ver respaldo</button><button class="btn btn-primary btn-sm" data-use-special="${agreement.id}">Usar en solicitud</button></div></div>`}).join(''):'<div class="empty">No hay acuerdos registrados.</div>';
+      q$('spList').querySelectorAll('[data-use-special]').forEach(button=>button.onclick=()=>useSpecial(agreements.find(agreement=>agreement.id===button.dataset.useSpecial)).catch(handleError));
+      q$('spList').querySelectorAll('[data-view-evidence]').forEach(button=>button.onclick=async()=>{const agreement=agreements.find(row=>row.id===button.dataset.viewEvidence),blob=await docGet(button.dataset.viewEvidence).catch(()=>null);if(!blob)return rpaError('Adjunto no disponible. Restaure un respaldo RPA con documentos.');downloadBlob(blob,blob.type,agreement.evidenceName);});
     }
     q$('spSave').onclick=async()=>{
       try{
